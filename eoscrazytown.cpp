@@ -38,8 +38,9 @@ void eoscrazytown::reveal() {
         presult = "" ;
         // exp:
         // r:  xaRbBaObE
-        // pr: annaRaBnnbBnnaEbOnn
-        if ( result[0] == 'x' ) { // draw
+        // pr: anx aR aB nn bB nn aE bO nn // no space !
+        //     012 34 56 78 9A BC DE FG HI
+        if ( result[0] == 'x' && p->beton[0] == 'x' ) { // draw
             presult += 'x' ; 
         }
         else { 
@@ -49,10 +50,15 @@ void eoscrazytown::reveal() {
                 presult += 'l' ; // lose
         }
 
-        if ( p->beton.substr(1,2) == result.substr(1,2) ) // 
-        if ( p->beton.substr(3,2) == result.substr(3,2) )
-        if ( p->beton.substr(5,2) == result.substr(5,2) )
-        if ( p->beton.substr(7,2) == result.substr(7,2) )
+        if ( p->beton.substr(3,2) == result.substr(1,2) ) 
+        if ( p->beton.substr(5,2) == result.substr(3,2) )
+        if ( p->beton.substr(7,2) == result.substr(5,2) )
+        if ( p->beton.substr(9,2) == result.substr(7,2) )
+
+        if ( p->beton.substr(11,2) == result.substr(1,2) ) 
+        if ( p->beton.substr(13,2) == result.substr(3,2) )
+        if ( p->beton.substr(15,2) == result.substr(5,2) )
+        if ( p->beton.substr(17,2) == result.substr(7,2) )
     }
 
 }

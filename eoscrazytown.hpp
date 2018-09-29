@@ -52,7 +52,8 @@ class eoscrazytown : public contract {
     // @abi table order i64    
     struct player {
         account_name  account;
-        asset         quantity;
+        string bets ;
+        string beton ;
         auto primary_key() const { return account; }
     
         EOSLIB_SERIALIZE(player, (account)(quantity)) 
