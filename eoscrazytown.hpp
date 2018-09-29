@@ -6,9 +6,11 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
 #include <eosiolib/contract.hpp>
-
 #include <cmath>
 #include <string>
+
+#include "config.hpp"
+#include "utils.hpp"
 
 #define EOS_SYMBOL S(4, EOS)
 #define TOKEN_CONTRACT N(eosio.token)
