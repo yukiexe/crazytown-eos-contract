@@ -29,6 +29,19 @@ class eoscrazytown : public contract {
     public:    
         eoscrazytown(account_name self) : token(self) {}
 
+    // @abi action    
+    void transfer(account_name   from,
+                  account_name   to,
+                  asset          quantity,
+                  string         memo);
+    
+    void onTransfer(account_name   from,
+                    account_name   to,
+                    asset          quantity,
+                    string         memo);  
+
+
+
     enum suitType {
         SPADE, HEART, DIAMOND, CLUD
     };
@@ -46,7 +59,7 @@ class eoscrazytown : public contract {
         card b ;       
         time roundTimeStamp;
         uint64_t primary_key() const { return id; }
-        EOSLIB_SERIALIZE(global, (id)(defer_id)(reserve)(supply)(claim_time)) 
+        EOSLIB_SERIALIZE(global, (id)(defer_id)(a)(b)(roundTimeStamp)) 
     };
     typedef eosio::multi_index<N(global), global> global_index;
     global_index global;                 
@@ -55,10 +68,9 @@ class eoscrazytown : public contract {
     struct player {
         account_name  account;
         string bets ;
-        string beton ;
         auto primary_key() const { return account; }
     
-        EOSLIB_SERIALIZE(player, (account)(quantity)) 
+        EOSLIB_SERIALIZE(player, (account)(bets)) 
     };
     typedef eosio::multi_index<N(player), player> player_index;
     player_index players;     
