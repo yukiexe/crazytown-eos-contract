@@ -25,6 +25,11 @@ using eosio::contract;
 using eosio::permission_level;
 using eosio::action;
 
+// todo: bank bets
+// todo: reveal()
+// todo: getResult()
+// todo: reveal() => send bonus
+
 class eoscrazytown : public contract {
     public:    
         eoscrazytown(account_name self) : token(self) {}
@@ -68,15 +73,22 @@ class eoscrazytown : public contract {
     struct player {
         account_name  account;
         string bets ;
+        vector<int64_t> vbets ;
+        asset quantity ;
         auto primary_key() const { return account; }
     
-        EOSLIB_SERIALIZE(player, (account)(bets)) 
+        EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
     };
     typedef eosio::multi_index<N(player), player> player_index;
     player_index players;     
   
 
     auto getResult( const card a,  const card b ) ;
+    const vector<int64_t> getBets(const string& s) ;
+    auto getBeton( const vector<int64_t> v ) ;
     void reveal() ;
+
+    auto checkBets( const asset eos, const string memo,
+                vector<int64_t> &vbets, int64_t &totalBets  ) ;
 
 };
