@@ -2,7 +2,7 @@
 
 auto eoscrazytown::checkBets( const asset eos, const string memo,
                               vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
-    vbets = getBets( p.bets ) ;
+    vbets = getBets( memo ) ;
     totalBets = getTotalBets( vbets ) ;    
     return eos.amount == totalBets ;
 }
@@ -69,9 +69,9 @@ auto eoscrazytown::getResult( const card a,  const card b ) { // todo: fix to ne
     return result ;
 }
 
-const vector<int64_t> eoscrazytown::getBets(const string& s) { // need protect
+const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { // need protect
     vector<int64_t> vbets;
-    auto vs = explode( s, 'c' ) ;
+    auto vs = explode( s, c ) ;
     for ( auto n:vs ) {
         vbets.push_back( (int64_t)string_to_price( n ) ) ;
     }

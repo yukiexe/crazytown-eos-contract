@@ -84,8 +84,9 @@ class eoscrazytown : public contract {
   
 
     auto getResult( const card a,  const card b ) ;
-    const vector<int64_t> getBets(const string& s) ;
+    const vector<int64_t> =getBets(const string& s, const char& c) ;
     auto getBeton( const vector<int64_t> v ) ;
+    
     void reveal() ;
 
     auto checkBets( const asset eos, const string memo,
