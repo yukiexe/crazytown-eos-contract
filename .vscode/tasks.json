@@ -18,7 +18,7 @@
         {
             "label": "Generate ABI",
             "type": "shell",
-            "command": "sh ${workspaceFolder}/.vscode/scripts/generate.sh ${fileDirname} ${fileBasenameNoExtension}"
+            "command": "sh ./.vscode/scripts/generate.sh ${fileBasenameNoExtension}"
         },
         {
             "label": "EZ Build",
