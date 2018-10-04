@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "reveal": "always",
+    "options": {
+        "cwd": "${workspaceFolder}"
+    },
+    "tasks": [
+        {
+            "label": "CMake",
+            "type": "shell",
+            "command": "sh ${workspaceFolder}/.vscode/scripts/compile.sh"
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "sh ${workspaceFolder}/.vscode/scripts/build.sh"
+        },
+        {
+            "label": "Generate ABI",
+            "type": "shell",
+            "command": "sh ${workspaceFolder}/.vscode/scripts/generate.sh ${fileDirname} ${fileBasenameNoExtension}"
+        },
+        {
+            "label": "EZ Build",
+            "type": "shell",
+            "command": "sh ./.vscode/scripts/buildez.sh ${fileBasenameNoExtension}",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
