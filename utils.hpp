@@ -9,7 +9,7 @@ const vector<string> explode(const string& s, const char& c) {
 
     for(auto n:s) {
         if(n != c) buff+=n; 
-        elseif(n == c && buff != "") { v.push_back(buff); buff = ""; }
+        else if(n == c && buff != "") { v.push_back(buff); buff = ""; }
     }
     if(buff != "") v.push_back(buff);
 

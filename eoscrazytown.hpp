@@ -5,7 +5,6 @@
 #pragma once
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
-#include <eosiolib/contract.hpp>
 #include <cmath>
 #include <string>
 
@@ -30,9 +29,12 @@ using eosio::action;
 // todo: getResult()
 // todo: reveal() => send bonus
 
-class eoscrazytown : public contract {
+class eoscrazytown : public eosio::contract {
     public:    
-        eoscrazytown(account_name self) : token(self) {}
+        eoscrazytown(account_name self) :
+        contract(self),
+        global(_self, _self), 
+        players(_self, _self) {}
 
     // @abi action    
     void transfer(account_name   from,
@@ -45,6 +47,8 @@ class eoscrazytown : public contract {
                     asset          quantity,
                     string         memo);  
 
+     // @abi action
+    void reveal() ;
 
 
     enum suitType {
@@ -64,32 +68,46 @@ class eoscrazytown : public contract {
         card b ;       
         time roundTimeStamp;
         uint64_t primary_key() const { return id; }
-        EOSLIB_SERIALIZE(global, (id)(defer_id)(a)(b)(roundTimeStamp)) 
+        //EOSLIB_SERIALIZE(global, (id)(defer_id)(a)(b)(roundTimeStamp)) 
     };
     typedef eosio::multi_index<N(global), global> global_index;
     global_index global;                 
 
-    // @abi table order i64    
+    // @abi table players account_name
     struct player {
         account_name  account;
         string bets ;
         vector<int64_t> vbets ;
         asset quantity ;
         auto primary_key() const { return account; }
-    
-        EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
+        // EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
     };
     typedef eosio::multi_index<N(player), player> player_index;
     player_index players;     
   
 
     auto getResult( const card a,  const card b ) ;
-    const vector<int64_t> =getBets(const string& s, const char& c) ;
+    const vector<int64_t> getBets(const string& s, const char& c) ;
     auto getBeton( const vector<int64_t> v ) ;
+    const int64_t getTotalBets(const vector<int64_t> v) ;
     
-    void reveal() ;
-
+   
     auto checkBets( const asset eos, const string memo,
                 vector<int64_t> &vbets, int64_t &totalBets  ) ;
 
 };
+
+extern "C" {
+    void apply(uint64_t receiver, uint64_t code, uint64_t action) {
+        auto self = receiver;
+        eoscrazytown thiscontract(self);
+        if ((code == N(eosio.token)) && (action == N(transfer))) {
+            execute_action(&thiscontract, &eoscrazytown::onTransfer);
+            return;
+        }
+        
+        if (code != receiver) return;
+        switch (action) { EOSIO_API(eoscrazytown, (reveal)) };
+        // eosio_exit(0);
+    }
+}

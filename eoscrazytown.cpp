@@ -2,7 +2,7 @@
 
 auto eoscrazytown::checkBets( const asset eos, const string memo,
                               vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
-    vbets = getBets( memo ) ;
+    vbets = getBets( memo, ' ' ) ;
     totalBets = getTotalBets( vbets ) ;    
     return eos.amount == totalBets ;
 }
@@ -21,9 +21,9 @@ void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, str
         vector<int64_t> vbets ;
         int64_t totalBets = 0 ;
         eosio_assert( checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
-        auto itr = player.find(from);
-        if (itr == player.end()) {
-            player.emplace(_self, [&](auto& p) {
+        auto itr = players.find(from);
+        if (itr == players.end()) {
+            players.emplace(_self, [&](auto& p) {
                 p.account = from;
                 p.bets = memo;
                 p.vbets = vbets ;
@@ -38,10 +38,10 @@ void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, str
                 p.quantity += eos;
             });*/
         }
-
+/*
         global.modify(global.begin(), 0, [&](auto &g) {
             g.reserve += eos;
-        });
+        });*/
     
     }
       
@@ -60,10 +60,10 @@ auto eoscrazytown::getResult( const card a,  const card b ) { // todo: fix to ne
     if ( b.suit ==  HEART || b.suit == DIAMOND ) result += "bR" ; // (5) red
     else result += "bB" ; // (7)
 
-    if ( a.points & 1 == 1 ) result += "aO" ; // (8) odd
+    if ( ( a.points & 1 ) == 1 ) result += "aO" ; // (8) odd
     else result += "aE" ; // (9)
 
-    if ( b.points & 1 == 1 ) result += "bO" ; // (10) odd
+    if ( ( b.points & 1 ) == 1 ) result += "bO" ; // (10) odd
     else result += "bE" ; // (11)
 
     return result ;
@@ -92,7 +92,7 @@ auto eoscrazytown::getBeton( const vector<int64_t> v ) {
 
 const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
     int64_t totalBets = 0 ;
-    for (auto n:vbets) totalBets += n ;
+    for (auto n:v) totalBets += n ;
 
     return totalBets ;
 }
@@ -107,13 +107,18 @@ void eoscrazytown::give_out_bonus ( const string result ) {
 void eoscrazytown::reveal() {
     require_auth(_self);
 
+    auto a = global.begin()->a ;
+    auto b = global.begin()->b ;
     auto result = getResult( a, b ) ;
     
     string beton ;
     // string presult ;
+    vector<int64_t> bets ;
+    int64_t bonus ;
     for ( auto p = begin(players) ; p != end(players) ; ++p ) {
         beton = getBeton( p->vbets ) ;
-        vector<int64_t> &bets = p->vbets ;
+        bets = p->vbets ;
+        bonus = 0 ;
         // exp:
         // r:     xaRbBaObE
         // new r: O X X X X X X X X X X // no space !
@@ -124,23 +129,23 @@ void eoscrazytown::reveal() {
             return ;
         }
         else { 
-            if ( p->beton[0] == result[0] )
+            if ( beton[0] == result[0] )
                 ;// presult += 'w' ; // win
             else
                 ;// presult += 'l' ; // lose
         }
 
-        if ( result[3] == beton[3] ) bonus += bet[3] + bet[3] * COLOR ; // (4)
-        if ( result[4] == beton[4] ) bonus += bet[4] + bet[4] * COLOR ; // (5)
+        if ( result[3] == beton[3] ) bonus += bets[3] + bets[3] * COLOR ; // (4)
+        if ( result[4] == beton[4] ) bonus += bets[4] + bets[4] * COLOR ; // (5)
 
-        if ( result[5] == beton[5] ) bonus += bet[5] + bet[5] * COLOR ; // (6)
-        if ( result[6] == beton[6] ) bonus += bet[6] + bet[6] * COLOR ; // (7)
+        if ( result[5] == beton[5] ) bonus += bets[5] + bets[5] * COLOR ; // (6)
+        if ( result[6] == beton[6] ) bonus += bets[6] + bets[6] * COLOR ; // (7)
 
-        if ( result[7] == beton[7] )  bonus += bet[7] + bet[7] * ODD ; // (8)
-        if ( result[8] == beton[8] )  bonus += bet[8] + bet[8] * EVEN ; // (9)
+        if ( result[7] == beton[7] )  bonus += bets[7] + bets[7] * ODD ; // (8)
+        if ( result[8] == beton[8] )  bonus += bets[8] + bets[8] * EVEN ; // (9)
 
-        if ( result[9] == beton[9] )  bonus += bet[9] + bet[9] * ODD ; // (10)
-        if ( result[10] == beton[10] )  bonus += bet[10] + bet[10] * EVEN ; // (11)
+        if ( result[9] == beton[9] )  bonus += bets[9] + bets[9] * ODD ; // (10)
+        if ( result[10] == beton[10] )  bonus += bets[10] + bets[10] * EVEN ; // (11)
 
         
     }
