@@ -1,14 +1,15 @@
 #include "eoscrazytown.hpp"
 
 // @abi action
-void eoscrazytown::init(const checksum256& hash){
+void eoscrazytown::init(const checksum256& hash) {
     require_auth( _self );
     auto g = _global.get();    
     g.hash = hash;
     _global.set(g, _self);
 }
 // @abi action
-void eoscrazytown::clear(){
+void eoscrazytown::clear() {
+    require_auth(_self);
     while (players.begin() != players.end()) {
         players.erase(players.begin());
     }
