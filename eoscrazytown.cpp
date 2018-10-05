@@ -3,14 +3,15 @@
 // @abi action
 void eoscrazytown::init(const checksum256& hash){
     require_auth( _self );
-    singleton_global global(_self, _self);
-    auto g = global.get(_self);    
+    auto g = _global.get();    
     g.hash = hash;
     _global.set(g, _self);
 }
 // @abi action
 void eoscrazytown::clear(){
-
+    while (players.begin() != players.end()) {
+        players.erase(players.begin());
+    }
 }
 // @abi action
 void eoscrazytown::test(){
@@ -177,6 +178,9 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){
                 std::string("winner winner chicken dinner") )
         ).send();
 
+        auto g = _global.get();    
+        g.hash = hash;
+        _global.set(g, _self);
     }
 
 }
