@@ -1,5 +1,12 @@
 #include "eoscrazytown.hpp"
 
+auto eoscrazytown::checkBets( const asset eos, const string memo,
+                              vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
+    vbets = getBets( memo, ' ' ) ;
+    totalBets = getTotalBets( vbets ) ;    
+    return eos.amount == totalBets ;
+}
+
 // input
 void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, string memo) {        
     if (to != _self) return ;
@@ -14,31 +21,19 @@ void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, str
     // todo: input check non-num
     vector<int64_t> vbets ;
     int64_t totalBets = 0 ;
-    eosio_assert( checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
+    eosio_assert( eoscrazytown::checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
     auto itr = players.find(from);
     if (itr == players.end()) {
         players.emplace(_self, [&](auto& p) {
             p.account = from;
             p.vbets = vbets ;
-            p.quantity = eos;
         });
     } else {
         eosio_assert( false, "Already bet.");
         return ;
-        /*
-        player.modify(itr, 0, [&](auto &p) {
-                
-                p.quantity += eos;
-            });*/
     }
 }
 
-auto eoscrazytown::checkBets( const asset eos, const string memo,
-                              vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
-    vbets = getBets( memo, ' ' ) ;
-    totalBets = getTotalBets( vbets ) ;    
-    return eos.amount == totalBets ;
-}
 
 auto eoscrazytown::getResult( const card a,  const card b ) {
     string result = "XXXXXXXXXXX" ;
@@ -95,14 +90,30 @@ const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
 }
 
 // Output
-void eoscrazytown::reveal(const uint64_t& id, const checksum256& seed) {
+void eoscrazytown::reveal(const checksum256& seed) {
     require_auth(_self);
 
-    // todo
-    auto result = getResult(
-        _global.get_or_create( _self, st_global{.a = card() }),
-        _global.get_or_create( _self, st_global{.b = card() })
-    );
+ 
+    auto result = getResult( 2, 3 ) ; // !!!
+    
+    /*
+    //        int RNG (int i) { return ( i + seed.hash() ) / 52 ;}
+
+         card a ;
+        card b ;       
+        time roundTimeStamp;
+        st_global( const checksum256& _seed ) { // todo
+            seed = _seed ;
+            vector<uint8_t> desk;
+            for (uint8_t i=0;i<52;++i) desk.push_back(i);
+            std::random_shuffle( desk.begin(), desk.end(), RNG);
+            a = desk[0] ;
+            b = desk[1] ;
+             
+            //    uint32_t r = cur + seed.hash[cur] % (52 - cur);
+            //     std::swap(desk[cur], desk[r]);
+    //  }
+*/
 
     string beton ;
     // string presult ;

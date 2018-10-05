@@ -1,4 +1,6 @@
+#pragma once
 #include <string>
+#include <vector>
 
 using namespace eosio;
 using namespace std;

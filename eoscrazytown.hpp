@@ -26,10 +26,6 @@ using eosio::contract;
 using eosio::permission_level;
 using eosio::action;
 
-// todo: reveal()
-// todo: getResult()
-// todo: reveal() => send bonus
-
 class eoscrazytown : public eosio::contract {
     public:    
         eoscrazytown(account_name self) :
@@ -37,37 +33,27 @@ class eoscrazytown : public eosio::contract {
         _global(_self, _self), //  
         players(_self, _self) {}
 
-    // @abi action    
+    /*    
     void transfer(account_name   from,
                   account_name   to,
                   asset          quantity,
                   string         memo);
-    
+    */
     void onTransfer(account_name   from,
                     account_name   to,
                     asset          quantity,
-                    string         memo);  
+                    string         memo);
 
     // @abi action
-    void reveal(const uint64_t& id, const checksum256& seed);
+    void reveal(const checksum256& seed);
 
 
     typedef uint8_t card ;
- 
+
     // @abi table global i64
     struct st_global {       
         uint64_t defer_id ;
-        card a ;
-        card b ;       
-        time roundTimeStamp; 
-        st_global() { // todo
-            vector<uint8_t> desk;
-            for (uint8_t i=0;i<52;++i) desk.push_back(i);
-            std::random_shuffle( desk.begin(), desk.end(), gen);
-             /*
-                uint32_t r = cur + seed.hash[cur] % (52 - cur);
-                 std::swap(desk[cur], desk[r]);*/  
-        }
+        checksum256 hash;
     };
     typedef singleton<N(global), st_global> singleton_global ;
     singleton_global _global ;
@@ -77,7 +63,6 @@ class eoscrazytown : public eosio::contract {
     struct player {
         account_name  account;
         vector<int64_t> vbets ;
-        asset quantity ;
         auto primary_key() const { return account; }
         // EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
     };
@@ -94,12 +79,7 @@ private:
     auto checkBets( const asset eos, const string memo,
                 vector<int64_t> &vbets, int64_t &totalBets  ) ;
 
-/*
-    uint8_t compute_random_roll(const checksum256& seed1, const checksum160& seed2) {
-        string mixed_seed = sha256_to_hex(seed1);
-        mixed_seed += sha1_to_hex(seed2);
-        return uint64_hash(mixed_seed) % 100 + 1;
-    }*/
+
                 
 };
 
@@ -113,7 +93,7 @@ extern "C" {
         }
         
         if (code != receiver) return;
-        switch (action) { EOSIO_API(eoscrazytown, (transfer)(reveal)) };
+        switch (action) { EOSIO_API(eoscrazytown, (reveal)) };
         // eosio_exit(0);
     }
 }
