@@ -48,8 +48,8 @@ class eoscrazytown : public eosio::contract {
                     asset          quantity,
                     string         memo);  
 
-     // @abi action
-     void reveal(const uint64_t& id, const checksum256& seed);
+    // @abi action
+    void reveal(const uint64_t& id, const checksum256& seed);
 
 
     typedef uint8_t card ;
@@ -62,7 +62,7 @@ class eoscrazytown : public eosio::contract {
         time roundTimeStamp; 
         st_global() { // todo
             vector<uint8_t> desk;
-            for (auto i=0;i<52;++i) desk.push_back(i);
+            for (uint8_t i=0;i<52;++i) desk.push_back(i);
             std::random_shuffle( desk.begin(), desk.end(), gen);
              /*
                 uint32_t r = cur + seed.hash[cur] % (52 - cur);

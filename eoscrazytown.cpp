@@ -79,7 +79,6 @@ const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { //
 
 auto eoscrazytown::getBeton( const vector<int64_t> v ) {
     string beton = "" ;
-
     for(auto n:v) {
         if ( n != 0 ) beton+='O';
         else beton+='X' ;
@@ -119,6 +118,7 @@ void eoscrazytown::reveal(const uint64_t& id, const checksum256& seed) {
         // r 2.0: O X X X X X X X X X X // no space !
         // beton: O X X O X X O X O O O // no space !
         if ( result[2] == o ) { // (3) draw
+            if ( result[2] == beton[2] ) bonus += bets[2] + bets[2] * DRAW ; // (3)
             // presult += 'x' ; 
 
             return ;
@@ -142,7 +142,14 @@ void eoscrazytown::reveal(const uint64_t& id, const checksum256& seed) {
         if ( result[9] == beton[9] )  bonus += bets[9] + bets[9] * ODD ; // (10)
         if ( result[10] == beton[10] )  bonus += bets[10] + bets[10] * EVEN ; // (11)
 
-        // 發錢
+        
+        action( // winner winner chicken dinner
+            permission_level{_self, N(active)},
+            _self, N(transfer),
+            make_tuple(_self, p->account, asset(bonus, EOS_SYMBOL),
+                std::string("winner winner chicken dinner") )
+        ).send();
+
     }
 
 }
