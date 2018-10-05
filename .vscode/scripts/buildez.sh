@@ -1,1 +1,1 @@
-eosio-cpp $1.cpp -o $1.wasm
+/usr/local/eosio/bin/eosiocpp -o $1.wast $1.cpp

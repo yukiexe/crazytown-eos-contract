@@ -1,5 +1,22 @@
 #include "eoscrazytown.hpp"
 
+// @abi action
+void eoscrazytown::init(const checksum256& hash){
+    require_auth( _self );
+    singleton_global global(_self, _self);
+    auto g = global.get(_self);    
+    g.hash = hash;
+    _global.set(g, _self);
+}
+// @abi action
+void eoscrazytown::clear(){
+
+}
+// @abi action
+void eoscrazytown::test(){
+
+}
+
 auto eoscrazytown::checkBets( const asset eos, const string memo,
                               vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
     vbets = getBets( memo, ' ' ) ;
@@ -90,10 +107,9 @@ const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
 }
 
 // Output
-void eoscrazytown::reveal(const checksum256& seed) {
+void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){
     require_auth(_self);
 
- 
     auto result = getResult( 2, 3 ) ; // !!!
     
     /*
