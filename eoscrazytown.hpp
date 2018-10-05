@@ -26,7 +26,6 @@ using eosio::contract;
 using eosio::permission_level;
 using eosio::action;
 
-// todo: bank bets
 // todo: reveal()
 // todo: getResult()
 // todo: reveal() => send bonus
@@ -53,31 +52,22 @@ class eoscrazytown : public eosio::contract {
      void reveal(const uint64_t& id, const checksum256& seed);
 
 
-     
-    
-    
-
-        /*
-        uint32_t r = cur + seed.hash[cur] % (52 - cur);
-        std::swap(desk[cur], desk[r]);*/  
-
-
-
     typedef uint8_t card ;
  
     // @abi table global i64
     struct st_global {       
-        uint64_t defer_id = 0;
-        card a = ;
+        uint64_t defer_id ;
+        card a ;
         card b ;       
         time roundTimeStamp; 
-
-    /*     
-    vector<uint8_t> desk;
-    for (auto i=0;i<52;++i) desk.push_back(i);
-
-    std::random_shuffle( desk.begin(), desk.end(), gen);
-    */
+        st_global() { // todo
+            vector<uint8_t> desk;
+            for (auto i=0;i<52;++i) desk.push_back(i);
+            std::random_shuffle( desk.begin(), desk.end(), gen);
+             /*
+                uint32_t r = cur + seed.hash[cur] % (52 - cur);
+                 std::swap(desk[cur], desk[r]);*/  
+        }
     };
     typedef singleton<N(global), st_global> singleton_global ;
     singleton_global _global ;
@@ -86,9 +76,8 @@ class eoscrazytown : public eosio::contract {
     // @abi table players account_name
     struct player {
         account_name  account;
-        // string bets ;
         vector<int64_t> vbets ;
-        // asset quantity ;
+        asset quantity ;
         auto primary_key() const { return account; }
         // EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
     };
@@ -105,14 +94,13 @@ private:
     auto checkBets( const asset eos, const string memo,
                 vector<int64_t> &vbets, int64_t &totalBets  ) ;
 
-
+/*
     uint8_t compute_random_roll(const checksum256& seed1, const checksum160& seed2) {
         string mixed_seed = sha256_to_hex(seed1);
         mixed_seed += sha1_to_hex(seed2);
         return uint64_hash(mixed_seed) % 100 + 1;
-    }
+    }*/
                 
-
 };
 
 extern "C" {

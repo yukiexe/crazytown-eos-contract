@@ -40,23 +40,28 @@ auto eoscrazytown::checkBets( const asset eos, const string memo,
     return eos.amount == totalBets ;
 }
 
-auto eoscrazytown::getResult( const card a,  const card b ) { // need rewrite
+auto eoscrazytown::getResult( const card a,  const card b ) {
     string result = "XXXXXXXXXXX" ;
     const char o = 'O' ;
-    if ( a.points > b.points ) result[0] = o ; // (1)
-    else if ( b.points > a.points ) result[1] = o ; // (2)
+    auto aS = a / 13 ;
+    auto bS = b / 13 ;
+    auto aP = a % 13 ;
+    auto bP = b % 13 ;
+
+    if ( aP > bP ) result[0] = o ; // (1)
+    else if ( aP < bP ) result[1] = o ; // (2)
     else result[2] = o ; // (3)
 
-    if ( a.suit ==  HEART || a.suit == DIAMOND ) result[3] = o ; // (4) red
+    if ( aS == 1 || aS == 2 ) result[3] = o ; // (4) red
     else result[5] = o ; // (6)
 
-    if ( b.suit ==  HEART || b.suit == DIAMOND ) result[4] = o ; // (5) red
+    if ( bS == 1 || bS == 2 ) result[4] = o ; // (5) red
     else result[6] = o  ; // (7)
 
-    if ( ( a.points & 1 ) == 1 ) result[7] = o  ; // (8) odd
+    if ( ( aP & 1 ) == 1 ) result[7] = o  ; // (8) odd
     else result[8] = o  ; // (9)
 
-    if ( ( b.points & 1 ) == 1 ) result[9] = o  ; // (10) odd
+    if ( ( bP & 1 ) == 1 ) result[9] = o  ; // (10) odd
     else result[10] = o  ; // (11)
 
     return result ;
