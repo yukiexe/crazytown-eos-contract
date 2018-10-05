@@ -1,12 +1,5 @@
 #include "eoscrazytown.hpp"
 
-auto eoscrazytown::checkBets( const asset eos, const string memo,
-                              vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
-    vbets = getBets( memo, ' ' ) ;
-    totalBets = getTotalBets( vbets ) ;    
-    return eos.amount == totalBets ;
-}
-
 // input
 void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, string memo) {        
     if (to != _self) return ;
@@ -15,56 +8,56 @@ void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, str
     eosio_assert(eos.is_valid(), "Invalid token transfer");
     eosio_assert(eos.symbol == EOS_SYMBOL, "only EOS token is allowed");
     eosio_assert(eos.amount > 0, "must bet a positive amount");
-
+    eosio_assert(memo != "" , "must have bets in memo") ;
+    eosio_assert(memo.size() >= 21  , "bets wrong") ;
+    
     // todo: input check non-num
-    if ( memo != "" && memo.size() > 11 ) { // need protect
-        vector<int64_t> vbets ;
-        int64_t totalBets = 0 ;
-        eosio_assert( checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
-        auto itr = players.find(from);
-        if (itr == players.end()) {
-            players.emplace(_self, [&](auto& p) {
-                p.account = from;
-                p.bets = memo;
-                p.vbets = vbets ;
-                p.quantity = eos;
-            });
-        } else {
-            eosio_assert( false, "Already bet.");
-            return ;
-            /*
-            player.modify(itr, 0, [&](auto &p) {
+    vector<int64_t> vbets ;
+    int64_t totalBets = 0 ;
+    eosio_assert( checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
+    auto itr = players.find(from);
+    if (itr == players.end()) {
+        players.emplace(_self, [&](auto& p) {
+            p.account = from;
+            p.vbets = vbets ;
+            p.quantity = eos;
+        });
+    } else {
+        eosio_assert( false, "Already bet.");
+        return ;
+        /*
+        player.modify(itr, 0, [&](auto &p) {
                 
                 p.quantity += eos;
             });*/
-        }
-/*
-        global.modify(global.begin(), 0, [&](auto &g) {
-            g.reserve += eos;
-        });*/
-    
     }
-      
-    
 }
 
-auto eoscrazytown::getResult( const card a,  const card b ) { // todo: fix to new type form
-    string result = "" ;
-    if ( a.points > b.points ) result += "a" ; // (1)
-    else if ( b.points > a.points ) result += "b" ; // (2)
-    else result += "x" ; // (3)
+auto eoscrazytown::checkBets( const asset eos, const string memo,
+                              vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
+    vbets = getBets( memo, ' ' ) ;
+    totalBets = getTotalBets( vbets ) ;    
+    return eos.amount == totalBets ;
+}
 
-    if ( a.suit ==  HEART || a.suit == DIAMOND ) result += "aR" ; // (4) red
-    else result += "aB" ; // (6)
+auto eoscrazytown::getResult( const card a,  const card b ) { // need rewrite
+    string result = "XXXXXXXXXXX" ;
+    const char o = 'O' ;
+    if ( a.points > b.points ) result[0] = o ; // (1)
+    else if ( b.points > a.points ) result[1] = o ; // (2)
+    else result[2] = o ; // (3)
 
-    if ( b.suit ==  HEART || b.suit == DIAMOND ) result += "bR" ; // (5) red
-    else result += "bB" ; // (7)
+    if ( a.suit ==  HEART || a.suit == DIAMOND ) result[3] = o ; // (4) red
+    else result[5] = o ; // (6)
 
-    if ( ( a.points & 1 ) == 1 ) result += "aO" ; // (8) odd
-    else result += "aE" ; // (9)
+    if ( b.suit ==  HEART || b.suit == DIAMOND ) result[4] = o ; // (5) red
+    else result[6] = o  ; // (7)
 
-    if ( ( b.points & 1 ) == 1 ) result += "bO" ; // (10) odd
-    else result += "bE" ; // (11)
+    if ( ( a.points & 1 ) == 1 ) result[7] = o  ; // (8) odd
+    else result[8] = o  ; // (9)
+
+    if ( ( b.points & 1 ) == 1 ) result[9] = o  ; // (10) odd
+    else result[10] = o  ; // (11)
 
     return result ;
 }
@@ -97,39 +90,36 @@ const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
     return totalBets ;
 }
 
-
-/*
-void eoscrazytown::give_out_bonus ( const string result ) {
- 
-}*/
-
-
-void eoscrazytown::reveal() {
+// Output
+void eoscrazytown::reveal(const uint64_t& id, const checksum256& seed) {
     require_auth(_self);
 
-    auto a = global.begin()->a ;
-    auto b = global.begin()->b ;
-    auto result = getResult( a, b ) ;
-    
+    // todo
+    auto result = getResult(
+        _global.get_or_create( _self, st_global{.a = card() }),
+        _global.get_or_create( _self, st_global{.b = card() })
+    );
+
     string beton ;
     // string presult ;
     vector<int64_t> bets ;
+    asset payout = asset(0, EOS_SYMBOL);
     int64_t bonus ;
+    const char o = 'O' ;
     for ( auto p = begin(players) ; p != end(players) ; ++p ) {
         beton = getBeton( p->vbets ) ;
         bets = p->vbets ;
         bonus = 0 ;
         // exp:
-        // r:     xaRbBaObE
-        // new r: O X X X X X X X X X X // no space !
+        // r 2.0: O X X X X X X X X X X // no space !
         // beton: O X X O X X O X O O O // no space !
-        if ( result[0] == 'x') { // draw
+        if ( result[2] == o ) { // (3) draw
             // presult += 'x' ; 
 
             return ;
         }
         else { 
-            if ( beton[0] == result[0] )
+            if ( result[0] == beton[0] )
                 ;// presult += 'w' ; // win
             else
                 ;// presult += 'l' ; // lose
@@ -147,7 +137,7 @@ void eoscrazytown::reveal() {
         if ( result[9] == beton[9] )  bonus += bets[9] + bets[9] * ODD ; // (10)
         if ( result[10] == beton[10] )  bonus += bets[10] + bets[10] * EVEN ; // (11)
 
-        
+        // 發錢
     }
 
 }

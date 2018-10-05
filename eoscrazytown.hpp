@@ -4,9 +4,11 @@
  */
 #pragma once
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/singleton.hpp>
 #include <eosiolib/asset.hpp>
 #include <cmath>
 #include <string>
+#include <algorithm>
 
 #include "config.hpp"
 #include "utils.hpp"
@@ -33,7 +35,7 @@ class eoscrazytown : public eosio::contract {
     public:    
         eoscrazytown(account_name self) :
         contract(self),
-        global(_self, _self), 
+        _global(_self, _self), //  
         players(_self, _self) {}
 
     // @abi action    
@@ -48,44 +50,52 @@ class eoscrazytown : public eosio::contract {
                     string         memo);  
 
      // @abi action
-    void reveal() ;
+     void reveal(const uint64_t& id, const checksum256& seed);
 
 
-    enum suitType {
-        SPADE, HEART, DIAMOND, CLUD
-    };
+     
+    
+    
 
-    struct card {
-        suitType suit ;
-        uint8_t points ;
-    } ;
+        /*
+        uint32_t r = cur + seed.hash[cur] % (52 - cur);
+        std::swap(desk[cur], desk[r]);*/  
+
+
+
+    typedef uint8_t card ;
  
     // @abi table global i64
-    struct global {
-        uint64_t id = 0;        
+    struct st_global {       
         uint64_t defer_id = 0;
-        card a ;
+        card a = ;
         card b ;       
-        time roundTimeStamp;
-        uint64_t primary_key() const { return id; }
-        //EOSLIB_SERIALIZE(global, (id)(defer_id)(a)(b)(roundTimeStamp)) 
+        time roundTimeStamp; 
+
+    /*     
+    vector<uint8_t> desk;
+    for (auto i=0;i<52;++i) desk.push_back(i);
+
+    std::random_shuffle( desk.begin(), desk.end(), gen);
+    */
     };
-    typedef eosio::multi_index<N(global), global> global_index;
-    global_index global;                 
+    typedef singleton<N(global), st_global> singleton_global ;
+    singleton_global _global ;
+                     
 
     // @abi table players account_name
     struct player {
         account_name  account;
-        string bets ;
+        // string bets ;
         vector<int64_t> vbets ;
-        asset quantity ;
+        // asset quantity ;
         auto primary_key() const { return account; }
         // EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
     };
     typedef eosio::multi_index<N(player), player> player_index;
     player_index players;     
   
-
+private:
     auto getResult( const card a,  const card b ) ;
     const vector<int64_t> getBets(const string& s, const char& c) ;
     auto getBeton( const vector<int64_t> v ) ;
@@ -94,6 +104,14 @@ class eoscrazytown : public eosio::contract {
    
     auto checkBets( const asset eos, const string memo,
                 vector<int64_t> &vbets, int64_t &totalBets  ) ;
+
+
+    uint8_t compute_random_roll(const checksum256& seed1, const checksum160& seed2) {
+        string mixed_seed = sha256_to_hex(seed1);
+        mixed_seed += sha1_to_hex(seed2);
+        return uint64_hash(mixed_seed) % 100 + 1;
+    }
+                
 
 };
 
@@ -107,7 +125,7 @@ extern "C" {
         }
         
         if (code != receiver) return;
-        switch (action) { EOSIO_API(eoscrazytown, (reveal)) };
+        switch (action) { EOSIO_API(eoscrazytown, (transfer)(reveal)) };
         // eosio_exit(0);
     }
 }
