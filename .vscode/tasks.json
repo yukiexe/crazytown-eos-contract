@@ -23,7 +23,12 @@
         {
             "label": "EZ Build",
             "type": "shell",
-            "command": "sh ./.vscode/scripts/buildez.sh ${fileBasenameNoExtension}",
+            "windows": {
+                "command": "sh ./.vscode/scripts/buildez.sh ${fileBasenameNoExtension}"
+            },
+            "osx": {
+                "command": "sh ./.vscode/scripts/osxEZbuild.sh ${fileBasenameNoExtension}"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
