@@ -112,26 +112,7 @@ const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
 void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){
     require_auth(_self);
 
-    auto result = getResult( 2, 3 ) ; // !!!
-    
-    /*
-    //        int RNG (int i) { return ( i + seed.hash() ) / 52 ;}
-
-         card a ;
-        card b ;       
-        time roundTimeStamp;
-        st_global( const checksum256& _seed ) { // todo
-            seed = _seed ;
-            vector<uint8_t> desk;
-            for (uint8_t i=0;i<52;++i) desk.push_back(i);
-            std::random_shuffle( desk.begin(), desk.end(), RNG);
-            a = desk[0] ;
-            b = desk[1] ;
-             
-            //    uint32_t r = cur + seed.hash[cur] % (52 - cur);
-            //     std::swap(desk[cur], desk[r]);
-    //  }
-*/
+    auto result = getResult( seed.hash[ 0 ] % 52, seed.hash[ 1 ] % 52 ) ;         
 
     string beton ;
     // string presult ;
@@ -153,25 +134,29 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){
             return ;
         }
         else { 
-            if ( result[0] == beton[0] )
-                ;// presult += 'w' ; // win
-            else
-                ;// presult += 'l' ; // lose
+            if ( result[0] == beton[0] ) {
+                // presult += 'w' ; // win 
+                bonus += bets[0] + bets[0] * SIDE ; // (1)
+            }
+            else {
+                // presult += 'l' ; // lose
+                bonus += bets[1] + bets[1] * SIDE ; // (2)
+            }
+    
+            if ( result[3] == beton[3] ) bonus += bets[3] + bets[3] * COLOR ; // (4)
+            if ( result[4] == beton[4] ) bonus += bets[4] + bets[4] * COLOR ; // (5)
+
+            if ( result[5] == beton[5] ) bonus += bets[5] + bets[5] * COLOR ; // (6)
+            if ( result[6] == beton[6] ) bonus += bets[6] + bets[6] * COLOR ; // (7)
+
+            if ( result[7] == beton[7] )  bonus += bets[7] + bets[7] * ODD ; // (8)
+            if ( result[8] == beton[8] )  bonus += bets[8] + bets[8] * EVEN ; // (9)
+
+            if ( result[9] == beton[9] )  bonus += bets[9] + bets[9] * ODD ; // (10)
+            if ( result[10] == beton[10] )  bonus += bets[10] + bets[10] * EVEN ; // (11)
+
         }
 
-        if ( result[3] == beton[3] ) bonus += bets[3] + bets[3] * COLOR ; // (4)
-        if ( result[4] == beton[4] ) bonus += bets[4] + bets[4] * COLOR ; // (5)
-
-        if ( result[5] == beton[5] ) bonus += bets[5] + bets[5] * COLOR ; // (6)
-        if ( result[6] == beton[6] ) bonus += bets[6] + bets[6] * COLOR ; // (7)
-
-        if ( result[7] == beton[7] )  bonus += bets[7] + bets[7] * ODD ; // (8)
-        if ( result[8] == beton[8] )  bonus += bets[8] + bets[8] * EVEN ; // (9)
-
-        if ( result[9] == beton[9] )  bonus += bets[9] + bets[9] * ODD ; // (10)
-        if ( result[10] == beton[10] )  bonus += bets[10] + bets[10] * EVEN ; // (11)
-
-        
         action( // winner winner chicken dinner
             permission_level{_self, N(active)},
             _self, N(transfer),
