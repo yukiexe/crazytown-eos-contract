@@ -74,6 +74,7 @@ public:
     typedef eosio::multi_index<N(sellorder), sellorder, 
         indexed_by<N(byprice), const_mem_fun<sellorder, uint64_t, &sellorder::get_price>>
     > sellorders;
+ 
 
     // @abi table
     struct whitelist {
@@ -85,6 +86,16 @@ public:
     };
     typedef eosio::multi_index<N(whitelist), whitelist> whitelists;
     
+    // @abi action
+    void buyreceipt(buyorder o) {
+        require_auth(_self);
+    }    
+
+    // @abi action
+    void sellrecepit(sellorder t) {
+        require_auth(_self);
+    }   
+
 private:
     uint64_t string_to_symbol(uint8_t precision, const char* str);
     bool is_valid_unit_price(uint64_t eos, uint64_t non_eos);
@@ -99,3 +110,37 @@ private:
     void buy(account_name account, asset bid, asset ask);
     void sell(account_name account, asset bid, asset ask);
 };
+
+void pomelo::apply(account_name contract, action_name act) 
+{
+    if (act == N(transfer)) {
+        auto transfer = unpack_action_data<currency::transfer>();
+        if (transfer.quantity.symbol == EOS) 
+        {
+            eosio_assert(contract == TOKEN_CONTRACT, "Transfer EOS must go through eosio.token");
+        }
+        else
+        {
+            assert_whitelist(transfer.quantity.symbol.name(), contract);
+        }
+        onTransfer(transfer.from, transfer.to, transfer.quantity, transfer.memo);
+        return;
+    }
+
+    if (contract != _self) return;
+
+    // needed for EOSIO_API macro
+    auto &thiscontract = *this;
+    switch (act) {
+        EOSIO_API(pomelo, (cancelbuy)(cancelsell)(setwhitelist)(rmwhitelist))
+    };
+}
+
+extern "C" {
+    [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) 
+    {
+        pomelo p(receiver);
+        p.apply(code, action);
+        eosio_exit(0);
+    }
+}

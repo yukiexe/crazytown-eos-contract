@@ -333,6 +333,7 @@ void pomelo::onTransfer(account_name from, account_name to, asset bid, std::stri
     }
 }
 
+
 void pomelo::transfer(account_name from, account_name to, asset bid, std::string memo) 
 { 
     return;
@@ -359,39 +360,5 @@ void pomelo::rmwhitelist(string symbol)
     if (itr != whitelist_table.end())
     {
         whitelist_table.erase(itr);
-    }
-}
-
-void pomelo::apply(account_name contract, action_name act) 
-{
-    if (act == N(transfer)) {
-        auto transfer = unpack_action_data<currency::transfer>();
-        if (transfer.quantity.symbol == EOS) 
-        {
-            eosio_assert(contract == TOKEN_CONTRACT, "Transfer EOS must go through eosio.token");
-        }
-        else
-        {
-            assert_whitelist(transfer.quantity.symbol.name(), contract);
-        }
-        onTransfer(transfer.from, transfer.to, transfer.quantity, transfer.memo);
-        return;
-    }
-
-    if (contract != _self) return;
-
-    // needed for EOSIO_API macro
-    auto &thiscontract = *this;
-    switch (act) {
-        EOSIO_API(pomelo, (cancelbuy)(cancelsell)(setwhitelist)(rmwhitelist))
-    };
-}
-
-extern "C" {
-    [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) 
-    {
-        pomelo p(receiver);
-        p.apply(code, action);
-        eosio_exit(0);
     }
 }
