@@ -84,25 +84,6 @@ public:
         EOSLIB_SERIALIZE(whitelist, (id)(contract))
     };
     typedef eosio::multi_index<N(whitelist), whitelist> whitelists;
-
-    // @abi table
-    struct txlog {
-        uint64_t id;
-        account_name buyer;
-        account_name seller;
-        asset bid;
-        asset ask;
-        time timestamp;
-
-        uint64_t primary_key() const { return id; }
-        uint64_t get_timestamp() const { return timestamp; } 
-        EOSLIB_SERIALIZE(txlog, (id)(buyer)(seller)(bid)(ask)(timestamp))        
-    };
-
-    
-    typedef eosio::multi_index<N(txlog), txlog, 
-        indexed_by<N(bytimestamp), const_mem_fun<txlog, uint64_t, &txlog::get_timestamp>>
-    > txlogs; 
     
 private:
     uint64_t string_to_symbol(uint8_t precision, const char* str);
@@ -115,8 +96,6 @@ private:
     account_name get_contract_name_by_symbol(symbol_type symbol);
     void publish_buyorder_if_needed(account_name account, asset bid, asset ask);
     void publish_sellorder_if_needed(account_name account, asset bid, asset ask);
-    void maintain_txlogs();
-    void insert_txlog(account_name buyer, account_name seller, asset ask, asset bid);
     void buy(account_name account, asset bid, asset ask);
     void sell(account_name account, asset bid, asset ask);
 };

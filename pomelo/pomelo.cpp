@@ -123,32 +123,6 @@ void pomelo::publish_sellorder_if_needed(account_name account, asset bid, asset 
     }
 }
 
-void pomelo::maintain_txlogs() 
-{
-    auto txlog_table = txlogs(_self, _self);
-    auto timestamp_index = txlog_table.get_index<N(bytimestamp)>();
-    for (auto itr = timestamp_index.lower_bound(current_time() - 3600); itr != timestamp_index.end(); ++itr)
-    {
-        timestamp_index.erase(itr);
-    }
-}
-
-void pomelo::insert_txlog(account_name buyer, account_name seller, asset ask, asset bid) 
-{
-    auto txlog_table = txlogs(_self, _self);
-    txlog_table.emplace(_self, [&](auto& t)
-    {
-        t.id = txlog_table.available_primary_key();
-        t.buyer = buyer;
-        t.seller = seller;    
-        t.ask = ask;
-        t.bid = bid;        
-        t.timestamp = current_time();
-    });
-
-    maintain_txlogs();
-}
-
 void pomelo::buy(account_name account, asset bid, asset ask) 
 {
     // Validate bid symbol
@@ -213,7 +187,7 @@ void pomelo::buy(account_name account, asset bid, asset ask)
         }
         
         // Log the matched transaction
-        insert_txlog(account, itr->account, asset(sold_token, ask.symbol), asset(sold_eos, EOS));
+        // insert_txlog(account, itr->account, asset(sold_token, ask.symbol), asset(sold_eos, EOS));
     }
 
     // The current order is not fully matched, publish the order
@@ -289,7 +263,7 @@ void pomelo::sell(account_name account, asset bid, asset ask)
         }
         
         // Log the matched transaction
-        insert_txlog(itr->account, account, asset(sold_token, ask.symbol), asset(sold_token * order_unit_price, EOS));
+        // insert_txlog(itr->account, account, asset(sold_token, ask.symbol), asset(sold_token * order_unit_price, EOS));
     }
 
     // The current order is not fully matched, publish the order
