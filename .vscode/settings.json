@@ -15,6 +15,11 @@
         "limits": "cpp",
         "new": "cpp",
         "type_traits": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "__split_buffer": "cpp",
+        "iterator": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "__bit_reference": "cpp"
     }
 }

@@ -75,7 +75,6 @@ public:
         indexed_by<N(byprice), const_mem_fun<sellorder, uint64_t, &sellorder::get_price>>
     > sellorders;
  
-
     // @abi table
     struct whitelist {
         uint64_t id = 0;
@@ -97,7 +96,7 @@ public:
     }   
 
 private:
-    uint64_t string_to_symbol(uint8_t precision, const char* str);
+    uint64_t my_string_to_symbol(uint8_t precision, const char* str);
     bool is_valid_unit_price(uint64_t eos, uint64_t non_eos);
     void assert_whitelist(string symbol, account_name contract);
     void assert_whitelist(symbol_type symbol, account_name contract);
@@ -108,7 +107,7 @@ private:
     void publish_buyorder_if_needed(account_name account, asset bid, asset ask);
     void publish_sellorder_if_needed(account_name account, asset bid, asset ask);
     void buy(account_name account, asset bid, asset ask);
-    void sell(account_name account, asset bid, asset ask);
+    void sell(account_name account, asset bid, asset ask);    
 };
 
 void pomelo::apply(account_name contract, action_name act) 

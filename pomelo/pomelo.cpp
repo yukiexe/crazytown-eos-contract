@@ -1,6 +1,6 @@
 #include "pomelo.hpp"
 
-uint64_t pomelo::string_to_symbol(uint8_t precision, const char* str) 
+uint64_t pomelo::my_string_to_symbol(uint8_t precision, const char* str) 
 {
     uint32_t len = 0;
     while (str[len]) 
@@ -50,7 +50,7 @@ vector<string> pomelo::split(string src, char c)
     vector<string> z;
     string t;
     for (int i = 0; i < src.size(); ++i){
-        if (src[i] == 'c') 
+        if (src[i] == c) 
         {
             z.push_back(t);
             t.clear();
@@ -60,6 +60,7 @@ vector<string> pomelo::split(string src, char c)
             t += src[i];
         }
   }
+  if (!t.empty()) z.push_back(t);
   return z;
 }
 
@@ -78,9 +79,13 @@ account_name pomelo::get_contract_name_by_symbol(symbol_type symbol)
 
 void pomelo::publish_buyorder_if_needed(account_name account, asset bid, asset ask)
 {
+
     // Validate bid symbol
     eosio_assert(bid.symbol == EOS, "Bid must be EOS");
 
+
+    // Validate ask symbol
+    eosio_assert(ask.is_valid(), "Ask must be valid");
     // Validate ask symbol
     eosio_assert(ask.symbol != EOS, "Ask must be non-EOS");
 
@@ -88,6 +93,10 @@ void pomelo::publish_buyorder_if_needed(account_name account, asset bid, asset a
     {
         auto buy_table = buyorders(_self, ask.symbol.name());
 
+        while (buy_table.begin() != buy_table.end()) {
+            buy_table.erase(buy_table.begin());
+        }
+        
         buy_table.emplace(_self, [&](auto& t) {
             t.id = buy_table.available_primary_key();
             t.account = account;
@@ -96,6 +105,17 @@ void pomelo::publish_buyorder_if_needed(account_name account, asset bid, asset a
             t.unit_price = bid.amount / ask.amount;
             t.timestamp = current_time();
         });
+
+        /*
+        auto buy_table2 = buyorders(_self, string_to_symbol(4, ask.symbol.name()));
+        buy_table2.emplace(_self, [&](auto& t) {
+            t.id = buy_table.available_primary_key();
+            t.account = account;
+            t.ask = ask;
+            t.bid = bid;
+            t.unit_price = bid.amount / ask.amount;
+            t.timestamp = current_time();
+        });*/
     }
 }
 
@@ -130,6 +150,9 @@ void pomelo::buy(account_name account, asset bid, asset ask)
 
     // Validate ask symbol
     eosio_assert(ask.symbol != EOS, "Ask must be non-EOS");
+
+     publish_buyorder_if_needed(account, bid, ask);
+     return;
 
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(bid.amount, ask.amount), "Bid mod ask must be 0");
@@ -310,6 +333,7 @@ void pomelo::cancelbuy(account_name account, string symbol, uint64_t id)
     buy_table.erase(itr);
 }
 
+
 void pomelo::onTransfer(account_name from, account_name to, asset bid, std::string memo) 
 {        
     if (to != _self) return;    
@@ -319,17 +343,24 @@ void pomelo::onTransfer(account_name from, account_name to, asset bid, std::stri
 
     auto splited_asset = split(memo, ' ');
     eosio_assert(splited_asset.size() == 2, "Memo should be a valid asset. Example: 1.2345 KBY");
-    auto asset_amount = string_to_amount(splited_asset[0]);
-    auto asset_symbol = string_to_symbol(4, splited_asset[1].c_str());
+    asset ask;
+    ask.amount = string_to_amount(splited_asset[0]);
+    ask.symbol = string_to_symbol(4, "PXL");
+//    auto asset_amount = string_to_amount(splited_asset[0]);
+ //   auto asset_symbol = string_to_symbol(4, splited_asset[1].c_str());
+
+ ask.print();
 
     if (bid.symbol == EOS) {
-        eosio_assert(asset_symbol != EOS, "Ask must be non-EOS");
-        buy(from, bid, asset(asset_amount, asset_symbol));
+        //eosio_assert(ask.symbol == S(4, "PXL"), "123");
+        //eosio_assert(ask.symbol == string_to_symbol(4, "PXL"), "123");
+        eosio_assert(ask.symbol != EOS, "Ask must be non-EOS");
+        buy(from, bid, ask);
     }
     else
     {
-        eosio_assert(asset_symbol == EOS, "Ask must be EOS");
-        sell(from, bid, asset(asset_amount, asset_symbol));
+        eosio_assert(ask.symbol == EOS, "Ask must be EOS");
+        sell(from, bid, ask);
     }
 }
 
