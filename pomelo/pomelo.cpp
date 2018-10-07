@@ -126,7 +126,7 @@ void pomelo::publish_sellorder_if_needed(account_name account, asset bid, asset 
 
     if (ask.amount > 0) 
     {
-        auto sell_table = sellorders(_self, ask.symbol.name());
+        auto sell_table = sellorders(_self, bid.symbol.name());
 
         sell_table.emplace(_self, [&](auto& t) {
             t.id = sell_table.available_primary_key();
@@ -141,6 +141,8 @@ void pomelo::publish_sellorder_if_needed(account_name account, asset bid, asset 
 
 void pomelo::buy(account_name account, asset bid, asset ask) 
 {
+
+
     // Validate bid symbol
     eosio_assert(bid.symbol == EOS, "Bid must be EOS");
 
@@ -153,23 +155,32 @@ void pomelo::buy(account_name account, asset bid, asset ask)
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(bid.amount, ask.amount), "Bid mod ask must be 0");
 
+
+    buyorder o;
+    o.id = buyorders(_self, ask.symbol.name()).available_primary_key();
+    o.account = account;
+    o.bid = bid;
+    o.ask = ask;
+    o.timestamp = now();
+    // Transfer Token to buyer
+    action(
+        permission_level{ _self, N(active) },
+        _self, N(buyreceipt),
+        o)
+        .send();    
+         
     // Retrive the sell table for current token
     auto sell_table = sellorders(_self, ask.symbol.name());
 
     // Calculate unit price
-    auto order_unit_price = bid.amount / ask.amount;
+    auto order_unit_price = bid.amount / ask.amount;  
 
     // Get unit price index
-    auto unit_price_index = sell_table.get_index<N(byprice)>();
+    auto unit_price_index = sell_table.get_index<N(byprice)>();    
     
     // Visit sell orders table
     for (auto itr = unit_price_index.lower_bound(order_unit_price); itr != unit_price_index.end(); ++itr)
     {
-        // Exit loop when the ask token is 0
-        if (ask.amount == 0) {
-            break;
-        }
-
         uint64_t sold_token = ask.amount <= itr->bid.amount ? ask.amount : itr->bid.amount;
         uint64_t sold_eos = sold_token * itr->unit_price;
 
@@ -178,8 +189,6 @@ void pomelo::buy(account_name account, asset bid, asset ask)
             t.bid.amount -= sold_token;
             t.ask.amount -= sold_eos;
         });
-
-        
         
         // Retrive issue contract of this token
         auto token_contract = get_contract_name_by_symbol(ask.symbol);
@@ -198,17 +207,17 @@ void pomelo::buy(account_name account, asset bid, asset ask)
             make_tuple(_self, account, asset(sold_token, ask.symbol), string("transfer")))
             .send();
 
-        /*ask.amount -= sold_token;
+        ask.amount -= sold_token;
         bid.amount -= sold_token * order_unit_price;
 
         // Erase the sell order from sell order table if the order finished.
         if (itr->ask.amount == 0)
         {
-            unit_price_index.erase(itr);
-        }*/
-        
-        // Log the matched transaction
-        // insert_txlog(account, itr->account, asset(sold_token, ask.symbol), asset(sold_eos, EOS));
+            itr = unit_price_index.erase(itr);
+        }        
+        else {
+            return;
+        }
     }
 
     // The current order is not fully matched, publish the order
@@ -217,8 +226,6 @@ void pomelo::buy(account_name account, asset bid, asset ask)
 
 void pomelo::sell(account_name account, asset bid, asset ask) 
 {
-
-
     // Validate bid symbol
     eosio_assert(bid.symbol != EOS, "Bid must be non-EOS");
 
@@ -239,25 +246,18 @@ void pomelo::sell(account_name account, asset bid, asset ask)
     
     // Visit sell orders table
     
-    for (auto itr = unit_price_index.upper_bound(order_unit_price - 1); itr != unit_price_index.end(); ++itr)
-    {
-        
+    for (auto itr = unit_price_index.upper_bound(order_unit_price - 1); itr != unit_price_index.end(); )
+    {    
         // Defensive
         if (order_unit_price > itr->unit_price)
         {
             continue;
         }
 
-        // Exit loop when the ask token is 0
-        if (ask.amount == 0) {
-            break;
-        }
-
         uint64_t sold_token = bid.amount <= itr->ask.amount ? bid.amount : itr->bid.amount;
         uint64_t sold_eos = sold_token * itr->unit_price;
 
         // Modify sell order record
-
 
         unit_price_index.modify(itr, 0, [&](auto& t) {
             t.bid.amount -= sold_token;
@@ -286,16 +286,18 @@ void pomelo::sell(account_name account, asset bid, asset ask)
         bid.amount -= sold_token;
         ask.amount -= sold_token * order_unit_price;
         
-        // Erase the sell order from sell order table if the order finished.
+        // Erase the buy order from buy order table if the order finished.
         if (itr->ask.amount == 0)
         {
-            //unit_price_index.erase(unit_price_index.find(itr->id));
-            //unit_price_index.erase(itr);
+            itr = unit_price_index.erase(itr);
         }        
+        else {
+            return;
+        }
     }
 
     // The current order is not fully matched, publish the order
-    //publish_sellorder_if_needed(account, bid, ask);
+    publish_sellorder_if_needed(account, bid, ask);
 }
 
 void pomelo::cancelsell(account_name account, string symbol, uint64_t id) 
