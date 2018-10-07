@@ -66,7 +66,7 @@ vector<string> pomelo::split(string src, char c)
 
 account_name pomelo::get_contract_name_by_symbol(string symbol)
 {
-    return get_contract_name_by_symbol(string_to_symbol(4, symbol.c_str()));
+    return get_contract_name_by_symbol(my_string_to_symbol(4, symbol.c_str()));
 }
 
 account_name pomelo::get_contract_name_by_symbol(symbol_type symbol)
@@ -151,8 +151,8 @@ void pomelo::buy(account_name account, asset bid, asset ask)
     // Validate ask symbol
     eosio_assert(ask.symbol != EOS, "Ask must be non-EOS");
 
-     publish_buyorder_if_needed(account, bid, ask);
-     return;
+    // publish_buyorder_if_needed(account, bid, ask);
+     //return;
 
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(bid.amount, ask.amount), "Bid mod ask must be 0");
@@ -297,7 +297,7 @@ void pomelo::cancelsell(account_name account, string symbol, uint64_t id)
 {
     require_auth(account);
     
-    auto sell_table = sellorders(_self, string_to_symbol(4, symbol.c_str()));  
+    auto sell_table = sellorders(_self, my_string_to_symbol(4, symbol.c_str()));  
     auto itr = sell_table.find(id);
 
     eosio_assert(itr->account == account, "Account does not match");
@@ -317,7 +317,7 @@ void pomelo::cancelbuy(account_name account, string symbol, uint64_t id)
 {
     require_auth(account);
 
-    auto buy_table = buyorders(_self, string_to_symbol(4, symbol.c_str()));    
+    auto buy_table = buyorders(_self, my_string_to_symbol(4, symbol.c_str()));    
     auto itr = buy_table.find(id); 
     
     eosio_assert(itr != buy_table.end(), "Trade id is not found");
@@ -376,7 +376,7 @@ void pomelo::setwhitelist(string symbol, account_name issuer)
     
     rmwhitelist(symbol);
     
-    auto whitelist_table = whitelists(_self, string_to_symbol(4, symbol.c_str()));
+    auto whitelist_table = whitelists(_self, my_string_to_symbol(4, symbol.c_str()));
     whitelist_table.emplace(_self, [&](auto& t) {
         t.id = 0;
         t.contract = issuer;
@@ -386,7 +386,7 @@ void pomelo::setwhitelist(string symbol, account_name issuer)
 void pomelo::rmwhitelist(string symbol)
 {
     require_auth(_self);
-    auto whitelist_table = whitelists(_self, string_to_symbol(4, symbol.c_str()));
+    auto whitelist_table = whitelists(_self, my_string_to_symbol(4, symbol.c_str()));
     auto itr = whitelist_table.begin();
     if (itr != whitelist_table.end())
     {

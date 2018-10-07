@@ -9,7 +9,9 @@ cleos -u http://api-direct.eosasia.one set contract crazytown.bp pomelo -p crazy
 
 #cleos -u http://api-direct.eosasia.one push action crazytown.bp setwhitelist '["PUB", "tokendapppub"]' -p crazytown.bp@active
 
-cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0100 EOS", "0.0100 PXL" ]' -p minakokojima@active
+#cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0100 EOS", "0.0100 PXL" ]' -p minakokojima@active
+
+cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "eosotcbackup", "crazytown.bp", "0.0100 PXL", "0.0100 EOS" ]' -p eosotcbackup@active
 
 #cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0100 EOS", "0.0100 PUB" ]' -p minakokojima@active
 
