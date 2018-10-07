@@ -238,8 +238,10 @@ void pomelo::sell(account_name account, asset bid, asset ask)
     auto unit_price_index = buy_table.get_index<N(byprice)>();
     
     // Visit sell orders table
+    
     for (auto itr = unit_price_index.upper_bound(order_unit_price - 1); itr != unit_price_index.end(); ++itr)
     {
+        
         // Defensive
         if (order_unit_price > itr->unit_price)
         {
@@ -255,12 +257,12 @@ void pomelo::sell(account_name account, asset bid, asset ask)
         uint64_t sold_eos = sold_token * itr->unit_price;
 
         // Modify sell order record
+
+
         unit_price_index.modify(itr, 0, [&](auto& t) {
             t.bid.amount -= sold_token;
             t.ask.amount -= sold_eos;
         });
-
-        
         
         // Retrive issue contract of this token
         auto token_contract = get_contract_name_by_symbol(bid.symbol);
@@ -273,22 +275,23 @@ void pomelo::sell(account_name account, asset bid, asset ask)
             .send();
 
         // Transfer Token to buyer
+        
         action(
             permission_level{ _self, N(active) },
             token_contract, N(transfer),
-            make_tuple(_self, itr->account, asset(sold_token, ask.symbol), string("transfer")))
+            make_tuple(_self, itr->account, asset(sold_token, bid.symbol), string("transfer")))
             .send();
+            
 
+        bid.amount -= sold_token;
         ask.amount -= sold_token * order_unit_price;
-
+        
         // Erase the sell order from sell order table if the order finished.
         if (itr->ask.amount == 0)
         {
-            unit_price_index.erase(itr);
-        }
-        
-        // Log the matched transaction
-        // insert_txlog(itr->account, account, asset(sold_token, ask.symbol), asset(sold_token * order_unit_price, EOS));
+            //unit_price_index.erase(unit_price_index.find(itr->id));
+            //unit_price_index.erase(itr);
+        }        
     }
 
     // The current order is not fully matched, publish the order
