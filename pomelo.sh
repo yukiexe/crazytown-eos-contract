@@ -7,14 +7,18 @@ cleos wallet unlock --password PW5JaGpLtoM1vtD1WxiAC4RDsr82FRUczmKgocw1KJZqVahB4
 cleos -u http://api-direct.eosasia.one set contract crazytown.bp pomelo -p crazytown.bp@active
 
 
-#cleos -u http://api-direct.eosasia.one push action crazytown.bp setwhitelist '["PUB", "tokendapppub"]' -p crazytown.bp@active
+#cleos -u http://api-direct.eosasia.one push action crazytown.bp setwhitelist '["PXL", "dacincubator"]' -p crazytown.bp@active
 
-#cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0100 EOS", "0.0100 PXL" ]' -p minakokojima@active
+#cleos -u http://api-direct.eosasia.one push action crazytown.bp rmwhitelist '["PXL"]' -p crazytown.bp@active
 
-cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "eosotcbackup", "crazytown.bp", "0.0100 PXL", "0.0100 EOS" ]' -p eosotcbackup@active
+#cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0010 EOS", "0.0010 PXL" ]' -p minakokojima@active
+
+#cleos -u http://api-direct.eosasia.one push action dacincubator transfer '[ "eosotcbackup", "crazytown.bp", "0.0010 PXL", "0.0010 EOS" ]' -p eosotcbackup@active
 
 #cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0100 EOS", "0.0100 PUB" ]' -p minakokojima@active
 
+
+#cleos -u http://api-direct.eosasia.one get table crazytown.bp PXL whitelist
 
 #cleos -u http://api-direct.eosasia.one get table crazytown.bp PXL buyorder
 

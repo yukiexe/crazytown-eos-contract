@@ -1,3 +1,4 @@
+#include <eosiolib/singleton.hpp>
 #include <eosiolib/currency.hpp>
 #include <eosiolib/asset.hpp>
 #include <math.h>
@@ -75,15 +76,11 @@ public:
         indexed_by<N(byprice), const_mem_fun<sellorder, uint64_t, &sellorder::get_price>>
     > sellorders;
  
-    // @abi table
+    // @abi table whitelist i64
     struct whitelist {
-        uint64_t id = 0;
         account_name contract;
-
-        uint64_t primary_key() const { return id; }
-        EOSLIB_SERIALIZE(whitelist, (id)(contract))
     };
-    typedef eosio::multi_index<N(whitelist), whitelist> whitelists;
+    typedef singleton<N(whitelist), whitelist> whitelist_index;
     
     // @abi action
     void buyreceipt(buyorder o) {
@@ -120,7 +117,7 @@ void pomelo::apply(account_name contract, action_name act)
         }
         else
         {
-            assert_whitelist(transfer.quantity.symbol.name(), contract);
+            assert_whitelist(transfer.quantity.symbol, contract);
         }
         onTransfer(transfer.from, transfer.to, transfer.quantity, transfer.memo);
         return;
