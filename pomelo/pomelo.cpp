@@ -155,19 +155,16 @@ void pomelo::buy(account_name account, asset bid, asset ask)
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(bid.amount, ask.amount), "Bid mod ask must be 0");
 
-
     buyorder o;
     o.id = buyorders(_self, ask.symbol.name()).available_primary_key();
     o.account = account;
     o.bid = bid;
     o.ask = ask;
     o.timestamp = now();
-    // Transfer Token to buyer
     action(
         permission_level{ _self, N(active) },
-        _self, N(buyreceipt),
-        o)
-        .send();    
+        _self, N(buyreceipt), o
+    ).send();    
          
     // Retrive the sell table for current token
     auto sell_table = sellorders(_self, ask.symbol.name());
@@ -234,6 +231,17 @@ void pomelo::sell(account_name account, asset bid, asset ask)
 
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(ask.amount, bid.amount), "Ask mod bid must be 0");
+
+    sellorder o;
+    o.id = sellorders(_self, bid.symbol.name()).available_primary_key();
+    o.account = account;
+    o.bid = bid;
+    o.ask = ask;
+    o.timestamp = now();
+    action(
+        permission_level{ _self, N(active) },
+        _self, N(sellreceipt), o
+    ).send();  
 
     // Retrive the buy table for current token
     auto buy_table = buyorders(_self, bid.symbol.name());

@@ -109,6 +109,7 @@ private:
 
 void pomelo::apply(account_name contract, action_name act) 
 {
+    auto &thiscontract = *this;
     if (act == N(transfer)) {
         auto transfer = unpack_action_data<currency::transfer>();
         if (transfer.quantity.symbol == EOS) 
@@ -125,8 +126,6 @@ void pomelo::apply(account_name contract, action_name act)
 
     if (contract != _self) return;
 
-    // needed for EOSIO_API macro
-    auto &thiscontract = *this;
     switch (act) {
         EOSIO_API(pomelo, (cancelbuy)(cancelsell)(setwhitelist)(rmwhitelist))
     };
