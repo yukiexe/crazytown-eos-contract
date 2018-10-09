@@ -58,6 +58,7 @@ class eoscrazytown : public eosio::contract {
 
     typedef uint8_t card ;
 
+    // @abi
     struct rec_reveal {
         card dragon ;
         card tiger ;
