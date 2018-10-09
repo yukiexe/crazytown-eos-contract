@@ -48,14 +48,14 @@
  (table 5 5 anyfunc)
  (elem (i32.const 0) $__wasm_nullptr $_ZN6pomelo12setwhitelistENSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEy $_ZN6pomelo9cancelbuyEyNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEy $_ZN6pomelo11rmwhitelistENSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE $_ZN6pomelo10cancelsellEyNSt3__112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEy)
  (memory $0 1)
- (data (i32.const 4) "\f0g\00\00")
+ (data (i32.const 4) "\10h\00\00")
  (data (i32.const 16) "transfer\00")
  (data (i32.const 32) "eosio.token\00")
  (data (i32.const 48) "Transfer EOS must go through eosio.token\00")
  (data (i32.const 96) "Transfer code does not match the contract in whitelist\00")
  (data (i32.const 160) "get\00")
  (data (i32.const 176) "read\00")
- (data (i32.const 192) "invalid character in symbol name\00")
+ (data (i32.const 192) "...invalid character in symbol name\00")
  (data (i32.const 240) "object passed to iterator_to is not in multi_index\00")
  (data (i32.const 304) "cannot pass end iterator to erase\00")
  (data (i32.const 352) "cannot increment end iterator\00")
@@ -82,18 +82,19 @@
  (data (i32.const 1264) "Ask must be EOS\00")
  (data (i32.const 1280) "next primary key in table is at autoincrement limit\00")
  (data (i32.const 1344) "sellreceipt\00")
- (data (i32.const 1360) "Ask mod bid must be 0\00")
- (data (i32.const 1392) "Bid must be non-EOS\00")
- (data (i32.const 1424) "cannot decrement end iterator when the table is empty\00")
- (data (i32.const 1488) "cannot decrement iterator at beginning of table\00")
- (data (i32.const 1536) "buyreceipt\00")
- (data (i32.const 1552) "Ask must be non-EOS...\00")
- (data (i32.const 1584) "Bid mod ask must be 0!!!\00")
- (data (i32.const 1616) "Bid must be EOS\00")
- (data (i32.const 1632) "Ask must be valid\00")
- (data (i32.const 1664) "Bid must be EOS.\00")
- (data (i32.const 1696) "singleton does not exist\00")
- (data (i32.const 10128) "malloc_from_freed was designed to only be called after _heap was completely allocated\00")
+ (data (i32.const 1360) "Ask must be EOS..\00")
+ (data (i32.const 1392) "Ask mod bid must be 0\00")
+ (data (i32.const 1424) "Bid must be non-EOS\00")
+ (data (i32.const 1456) "cannot decrement end iterator when the table is empty\00")
+ (data (i32.const 1520) "cannot decrement iterator at beginning of table\00")
+ (data (i32.const 1568) "buyreceipt\00")
+ (data (i32.const 1584) "Ask must be non-EOS...\00")
+ (data (i32.const 1616) "Bid mod ask must be 0!!!\00")
+ (data (i32.const 1648) "Bid must be EOS\00")
+ (data (i32.const 1664) "Ask must be valid\00")
+ (data (i32.const 1696) "Bid must be EOS.\00")
+ (data (i32.const 1728) "singleton does not exist\00")
+ (data (i32.const 10160) "malloc_from_freed was designed to only be called after _heap was completely allocated\00")
  (export "memory" (memory $0))
  (export "now" (func $now))
  (export "_ZeqRK11checksum256S1_" (func $_ZeqRK11checksum256S1_))
@@ -1200,7 +1201,7 @@
     (get_local $2)
     (i32.const 0)
    )
-   (i32.const 1696)
+   (i32.const 1728)
   )
   (i64.load
    (get_local $2)
@@ -12666,7 +12667,7 @@
     )
     (i64.const 1397703940)
    )
-   (i32.const 1616)
+   (i32.const 1648)
   )
   (call $eosio_assert
    (i64.ne
@@ -12677,7 +12678,7 @@
     )
     (i64.const 1397703940)
    )
-   (i32.const 1552)
+   (i32.const 1584)
   )
   (call $eosio_assert
    (i64.eqz
@@ -12694,7 +12695,7 @@
      )
     )
    )
-   (i32.const 1584)
+   (i32.const 1616)
   )
   (set_local $8
    (call $_ZN6pomelo8buyorderC2Ev
@@ -13122,7 +13123,7 @@
    (i64.const 59)
   )
   (set_local $26
-   (i32.const 1536)
+   (i32.const 1568)
   )
   (set_local $31
    (i64.const 0)
@@ -15756,7 +15757,7 @@
     )
     (i64.const 1397703940)
    )
-   (i32.const 1392)
+   (i32.const 1424)
   )
   (call $eosio_assert
    (i64.eq
@@ -15765,7 +15766,7 @@
     )
     (i64.const 1397703940)
    )
-   (i32.const 1264)
+   (i32.const 1360)
   )
   (call $eosio_assert
    (i64.eqz
@@ -15782,7 +15783,7 @@
      )
     )
    )
-   (i32.const 1360)
+   (i32.const 1392)
   )
   (set_local $8
    (call $_ZN6pomelo9sellorderC2Ev
@@ -18849,7 +18850,7 @@
       )
       (i32.const 1)
      )
-     (i32.const 1488)
+     (i32.const 1520)
     )
     (br $label$0)
    )
@@ -18872,7 +18873,7 @@
      )
      (i32.const -1)
     )
-    (i32.const 1424)
+    (i32.const 1456)
    )
    (call $eosio_assert
     (i32.xor
@@ -18890,7 +18891,7 @@
      )
      (i32.const 1)
     )
-    (i32.const 1424)
+    (i32.const 1456)
    )
   )
   (i32.store
@@ -19964,7 +19965,7 @@
     )
     (i64.const 1397703940)
    )
-   (i32.const 1392)
+   (i32.const 1424)
   )
   (call $eosio_assert
    (i64.eq
@@ -20669,7 +20670,7 @@
       )
       (i32.const 1)
      )
-     (i32.const 1488)
+     (i32.const 1520)
     )
     (br $label$0)
    )
@@ -20692,7 +20693,7 @@
      )
      (i32.const -1)
     )
-    (i32.const 1424)
+    (i32.const 1456)
    )
    (call $eosio_assert
     (i32.xor
@@ -20710,7 +20711,7 @@
      )
      (i32.const 1)
     )
-    (i32.const 1424)
+    (i32.const 1456)
    )
   )
   (i32.store
@@ -21223,7 +21224,7 @@
     )
     (i64.const 1397703940)
    )
-   (i32.const 1664)
+   (i32.const 1696)
   )
   (set_local $5
    (i64.load offset=8
@@ -21338,7 +21339,7 @@
   )
   (call $eosio_assert
    (get_local $7)
-   (i32.const 1632)
+   (i32.const 1664)
   )
   (call $eosio_assert
    (i64.ne
@@ -23571,7 +23572,7 @@
  )
  (func $malloc (param $0 i32) (result i32)
   (call $_ZN5eosio14memory_manager6mallocEm
-   (i32.const 1724)
+   (i32.const 1756)
    (get_local $0)
   )
  )
@@ -23816,7 +23817,7 @@
          )
         )
        )
-       (i32.const 10128)
+       (i32.const 10160)
       )
       (set_local $13
        (i32.add
@@ -24040,13 +24041,13 @@
    (block $label$1
     (br_if $label$1
      (i32.eqz
-      (i32.load8_u offset=10214
+      (i32.load8_u offset=10246
        (i32.const 0)
       )
      )
     )
     (set_local $7
-     (i32.load offset=10216
+     (i32.load offset=10248
       (i32.const 0)
      )
     )
@@ -24055,11 +24056,11 @@
    (set_local $7
     (current_memory)
    )
-   (i32.store8 offset=10214
+   (i32.store8 offset=10246
     (i32.const 0)
     (i32.const 1)
    )
-   (i32.store offset=10216
+   (i32.store offset=10248
     (i32.const 0)
     (tee_local $7
      (i32.shl
@@ -24110,7 +24111,7 @@
        )
       )
       (set_local $3
-       (i32.load offset=10216
+       (i32.load offset=10248
         (i32.const 0)
        )
       )
@@ -24118,7 +24119,7 @@
      (set_local $8
       (i32.const 0)
      )
-     (i32.store offset=10216
+     (i32.store offset=10248
       (i32.const 0)
       (get_local $3)
      )
@@ -24172,18 +24173,18 @@
      )
      (block $label$6
       (br_if $label$6
-       (i32.load8_u offset=10214
+       (i32.load8_u offset=10246
         (i32.const 0)
        )
       )
       (set_local $3
        (current_memory)
       )
-      (i32.store8 offset=10214
+      (i32.store8 offset=10246
        (i32.const 0)
        (i32.const 1)
       )
-      (i32.store offset=10216
+      (i32.store offset=10248
        (i32.const 0)
        (tee_local $3
         (i32.shl
@@ -24251,12 +24252,12 @@
        )
       )
       (set_local $6
-       (i32.load offset=10216
+       (i32.load offset=10248
         (i32.const 0)
        )
       )
      )
-     (i32.store offset=10216
+     (i32.store offset=10248
       (i32.const 0)
       (i32.add
        (get_local $6)
@@ -24516,7 +24517,7 @@
     (br_if $label$1
      (i32.lt_s
       (tee_local $2
-       (i32.load offset=10108
+       (i32.load offset=10140
         (i32.const 0)
        )
       )
@@ -24524,7 +24525,7 @@
      )
     )
     (set_local $3
-     (i32.const 9916)
+     (i32.const 9948)
     )
     (set_local $1
      (i32.add
@@ -24532,7 +24533,7 @@
        (get_local $2)
        (i32.const 12)
       )
-      (i32.const 9916)
+      (i32.const 9948)
      )
     )
     (loop $label$2
@@ -24624,7 +24625,7 @@
     (br_if $label$0
      (i32.eqz
       (tee_local $2
-       (i32.load offset=10220
+       (i32.load offset=10252
         (i32.const 0)
        )
       )

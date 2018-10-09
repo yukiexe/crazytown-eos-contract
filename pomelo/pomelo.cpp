@@ -10,7 +10,7 @@ uint64_t pomelo::my_string_to_symbol(uint8_t precision, const char* str)
     uint64_t result = 0;
     for (uint32_t i = 0; i < len; ++i) {
         // All characters must be upper case alaphabets
-        eosio_assert(str[i] >= 'A' && str[i] <= 'Z', "invalid character in symbol name");
+        eosio_assert(str[i] >= 'A' && str[i] <= 'Z', "...invalid character in symbol name");
         result |= (uint64_t(str[i]) << (8 * (i + 1)));
     }
     result |= uint64_t(precision);
@@ -226,7 +226,7 @@ void pomelo::sell(account_name account, asset bid, asset ask)
     eosio_assert(bid.symbol != EOS, "Bid must be non-EOS");
 
     // Validate ask symbol
-    eosio_assert(ask.symbol == EOS, "Ask must be EOS");
+    eosio_assert(ask.symbol == EOS, "Ask must be EOS..");
 
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(ask.amount, bid.amount), "Ask mod bid must be 0");
