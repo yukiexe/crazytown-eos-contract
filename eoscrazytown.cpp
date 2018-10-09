@@ -185,6 +185,7 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
 
         }
 
+        if ( bonus != 0 )
         action( // winner winner chicken dinner
             permission_level{_self, N(active)},
             _self, N(transfer),

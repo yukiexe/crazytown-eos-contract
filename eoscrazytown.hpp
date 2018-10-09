@@ -16,6 +16,9 @@
 #define TOKEN_CONTRACT N(eosio.token)
 
 typedef double real_type;
+typedef uint8_t card ;
+
+
 
 using std::string;
 using eosio::symbol_name;
@@ -43,28 +46,17 @@ class eoscrazytown : public eosio::contract {
     // @abi action
     void reveal(const checksum256& seed, const checksum256& hash);
 
-    /*    
+    // @abi action
     void transfer(account_name   from,
                   account_name   to,
                   asset          quantity,
                   string         memo);
-    */
+    
     void onTransfer(account_name   &from,
                     account_name   &to,
                     asset          &quantity,
                     string         &memo);
 
-
-
-    typedef uint8_t card ;
-
-    // @abi
-    struct rec_reveal {
-        card dragon ;
-        card tiger ;
-        checksum256 server_hash;
-        checksum256 client_seed;
-    };
 
     // @abi table global
     struct st_global {       
