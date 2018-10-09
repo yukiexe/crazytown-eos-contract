@@ -6,6 +6,8 @@ void eoscrazytown::init(const checksum256& hash) {
     auto g = _global.get_or_create( _self, st_global{.hash = hash});    
     g.hash = hash;
     _global.set(g, _self);
+
+    clear() ;
 }
 // @abi action
 void eoscrazytown::clear() {
