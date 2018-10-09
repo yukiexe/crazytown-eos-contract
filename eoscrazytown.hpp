@@ -4,15 +4,14 @@
  */
 #pragma once
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/singleton.hpp>
 #include <eosiolib/asset.hpp>
-#include <cmath>
-#include <string>
-#include <algorithm>
+#include <eosiolib/singleton.hpp>
+// #include <cmath>
+// #include <string>
 
 #include "config.hpp"
 #include "utils.hpp"
-
+ 
 #define EOS_SYMBOL S(4, EOS)
 #define TOKEN_CONTRACT N(eosio.token)
 
@@ -22,7 +21,6 @@ using std::string;
 using eosio::symbol_name;
 using eosio::asset;
 using eosio::symbol_type;
-using eosio::contract;
 using eosio::permission_level;
 using eosio::action;
 
@@ -39,7 +37,9 @@ class eoscrazytown : public eosio::contract {
     // @abi action
     void clear();     
     // @abi action
-    void test();                        
+    void test();
+    // @abi action
+    void verify( const checksum256& seed, const checksum256& hash );                        
     // @abi action
     void reveal(const checksum256& seed, const checksum256& hash);
 
@@ -49,10 +49,10 @@ class eoscrazytown : public eosio::contract {
                   asset          quantity,
                   string         memo);
     */
-    void onTransfer(account_name   from,
-                    account_name   to,
-                    asset          quantity,
-                    string         memo);
+    void onTransfer(account_name   &from,
+                    account_name   &to,
+                    asset          &quantity,
+                    string         &memo);
 
     typedef uint8_t card ;
 
@@ -78,15 +78,14 @@ class eoscrazytown : public eosio::contract {
     void apply(account_name code, action_name action);       
   
 private:
-    auto getResult( const card a,  const card b ) ;
-    const vector<int64_t> getBets(const string& s, const char& c) ;
-    auto getBeton( const vector<int64_t> v ) ;
-    const int64_t getTotalBets(const vector<int64_t> v) ;
-    
-   
-    auto checkBets( const asset eos, const string memo,
+    const vector<int64_t> getBets(const string &s, const char &c) ;
+    auto getBeton( const vector<int64_t> &v );
+    const int64_t getTotalBets(const vector<int64_t> &v);
+
+    auto checkBets( const asset &eos, const string &memo,
                 vector<int64_t> &vbets, int64_t &totalBets  );                
 
+    auto getResult( const card &a,  const card &b ) ;
 };
 
 
