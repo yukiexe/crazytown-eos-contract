@@ -54,9 +54,18 @@ class eoscrazytown : public eosio::contract {
                     asset          &quantity,
                     string         &memo);
 
+
+
     typedef uint8_t card ;
 
-    // @abi table global i64
+    struct rec_reveal {
+        card dragon ;
+        card tiger ;
+        checksum256 server_hash;
+        checksum256 client_seed;
+    };
+
+    // @abi table global
     struct st_global {       
         uint64_t defer_id = 0;
         checksum256 hash;
@@ -64,12 +73,12 @@ class eoscrazytown : public eosio::contract {
     typedef singleton<N(global), st_global> singleton_global;
     singleton_global _global;         
 
-    // @abi table players account_name
+    // @abi table player
     struct player {
         account_name  account;
         vector<int64_t> vbets ;
-        auto primary_key() const { return account; }
-        // EOSLIB_SERIALIZE(player, (account)(bets)(vbets)(quantity)) 
+        uint64_t     primary_key() const { return account; }
+        // EOSLIB_SERIALIZE(player, (account)(vbets)) 
     };
     typedef eosio::multi_index<N(player), player> player_index;
     player_index players;  

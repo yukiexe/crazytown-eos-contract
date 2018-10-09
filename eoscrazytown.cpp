@@ -21,7 +21,7 @@ void eoscrazytown::test(){
 
 auto eoscrazytown::checkBets( const asset &eos, const string &memo,
                               vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
-    vbets = getBets( memo, ' ' ) ;
+    vbets = getBets( memo, ',' ) ;
     totalBets = getTotalBets( vbets ) ;    
     return eos.amount == totalBets ;
 }
@@ -88,7 +88,21 @@ const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { //
         vbets.push_back( (int64_t)string_to_price( n ) ) ;
     }
 
-    return vbets ;
+    // change format
+    vector<int64_t> v(vbets) ;
+    v[0] = vbets[1] ; // (1)
+    v[1] = vbets[6] ; // (2)
+    v[2] = vbets[0] ; // (3)
+    v[3] = vbets[4] ; // (4)
+    v[4] = vbets[9] ; // (5)
+    v[5] = vbets[5] ; // (6)
+    v[6] = vbets[10] ; // (7)
+    v[7] = vbets[2] ; // (8)
+    v[8] = vbets[3] ; // (9)
+    v[9] = vbets[7] ; // (10)
+    v[10] = vbets[8] ; // (11)
+
+    return v ;
 }
 
 auto eoscrazytown::getBeton( const vector<int64_t> &v ) {
@@ -109,16 +123,28 @@ const int64_t eoscrazytown::getTotalBets(const vector<int64_t> &v) {
 void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // hash for next round
     require_auth(_self);
 
-    auto result = getResult( seed.hash[ 0 ] % 52, seed.hash[ 1 ] % 52 ) ;         
+    card dragon = seed.hash[ 0 ] % 52 ;
+    card tiger = seed.hash[ 1 ] % 52 ;
+    const rec_reveal _reveal{
+        .dragon = dragon,
+        .tiger = tiger,
+        .server_hash = _global.get().hash,
+        .client_seed = seed,
+    }; 
+    
+    action( // give result to client
+            permission_level{_self, N(active)},
+            _self, N(receipt), _reveal
+    ).send();
+
+    auto result = getResult( _reveal.dragon, _reveal.tiger ) ;         
 
     string beton ;
     // string presult ;
-    // vector<int64_t> &bets ;
-    asset payout = asset(0, EOS_SYMBOL);
     int64_t bonus ;
     const char o = 'O' ;
     for (const auto& p : players ) {
-        auto bets = p.vbets ;
+        auto& bets = p.vbets ;
         beton = getBeton( bets ) ;
     
         bonus = 0 ;
@@ -127,14 +153,20 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
         // beton: O X X O X X O X O O O // no space !
         if ( result[2] == o ) { // (3) draw
             if ( result[2] == beton[2] ) bonus += bets[2] + bets[2] * DRAW ; // (3)
+            bonus += bets[0] / 2 ;
+            bonus += bets[1] / 2 ;
+            if ( result[3] == beton[3] ) bonus += bets[3] + bets[3] * COLOR ; // (4)
+            if ( result[4] == beton[4] ) bonus += bets[4] + bets[4] * COLOR ; // (5)
 
-            return ;
+            if ( result[5] == beton[5] ) bonus += bets[5] + bets[5] * COLOR ; // (6)
+            if ( result[6] == beton[6] ) bonus += bets[6] + bets[6] * COLOR ; // (7)
+
         }
         else { 
-            if ( result[0] == beton[0] ) {
-                bonus += bets[0] + bets[0] * SIDE ; // (1)
+            if ( result[0] == o ) {
+                if ( result[0] == beton[0] ) bonus += bets[0] + bets[0] * SIDE ; // (1)  
             }
-            else {
+            else { // result[1] == o
                if ( result[1] == beton[1] ) bonus += bets[1] + bets[1] * SIDE ; // (2)
 
             }
