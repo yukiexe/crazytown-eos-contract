@@ -88,7 +88,7 @@ public:
     }    
 
     // @abi action
-    void sellrecepit(sellorder t) {
+    void sellreceipt(sellorder t) {
         require_auth(_self);
     }   
 

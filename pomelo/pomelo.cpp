@@ -141,29 +141,28 @@ void pomelo::publish_sellorder_if_needed(account_name account, asset bid, asset 
 
 void pomelo::buy(account_name account, asset bid, asset ask) 
 {
-
-
     // Validate bid symbol
     eosio_assert(bid.symbol == EOS, "Bid must be EOS");
 
     // Validate ask symbol
-    eosio_assert(ask.symbol != EOS, "Ask must be non-EOS");
+    eosio_assert(ask.symbol != EOS, "Ask must be non-EOS...");
 
     // publish_buyorder_if_needed(account, bid, ask);
      //return;
 
     // Validate unit price is integer
-    eosio_assert(is_valid_unit_price(bid.amount, ask.amount), "Bid mod ask must be 0");
+    eosio_assert(is_valid_unit_price(bid.amount, ask.amount), "Bid mod ask must be 0!!!");
 
-    buyorder o;
-    o.id = buyorders(_self, ask.symbol.name()).available_primary_key();
-    o.account = account;
-    o.bid = bid;
-    o.ask = ask;
-    o.timestamp = now();
+    buyorder receipt;
+    receipt.id = buyorders(_self, ask.symbol.name()).available_primary_key();
+    receipt.account = account;
+    receipt.bid = bid;
+    receipt.ask = ask;
+    receipt.timestamp = now();
+
     action(
         permission_level{ _self, N(active) },
-        _self, N(buyreceipt), o
+        _self, N(buyreceipt), receipt
     ).send();    
          
     // Retrive the sell table for current token
@@ -232,15 +231,15 @@ void pomelo::sell(account_name account, asset bid, asset ask)
     // Validate unit price is integer
     eosio_assert(is_valid_unit_price(ask.amount, bid.amount), "Ask mod bid must be 0");
 
-    sellorder o;
-    o.id = sellorders(_self, bid.symbol.name()).available_primary_key();
-    o.account = account;
-    o.bid = bid;
-    o.ask = ask;
-    o.timestamp = now();
+    sellorder recepit;
+    recepit.id = sellorders(_self, bid.symbol.name()).available_primary_key();
+    recepit.account = account;
+    recepit.bid = bid;
+    recepit.ask = ask;
+    recepit.timestamp = now();
     action(
         permission_level{ _self, N(active) },
-        _self, N(sellreceipt), o
+        _self, N(sellreceipt), recepit
     ).send();  
 
     // Retrive the buy table for current token
@@ -351,6 +350,7 @@ void pomelo::cancelbuy(account_name account, string symbol, uint64_t id)
 
 void pomelo::onTransfer(account_name from, account_name to, asset bid, std::string memo) 
 {        
+    
     if (to != _self) return;    
     require_auth(from);
     eosio_assert(bid.is_valid(), "invalid token transfer");

@@ -1,7 +1,9 @@
 cleos wallet unlock --password PW5JaGpLtoM1vtD1WxiAC4RDsr82FRUczmKgocw1KJZqVahB4LZ1u
 
 #/usr/local/eosio/bin/eosiocpp -g pomelo/pomelo.abi pomelo/pomelo.cpp
-/usr/local/eosio/bin/eosiocpp -o eosotcbackup/eosotcbackup.wast eosotcbackup/eosotcbackup.cpp
+/usr/local/eosio/bin/eosiocpp -g eoscrazytown/eoscrazytown.abi eoscrazytown/eoscrazytown.cpp
+/usr/local/eosio/bin/eosiocpp -o eoscrazytown/eoscrazytown.wast eoscrazytown/eoscrazytown.cpp
+
 
 #
 #cleos -u http://api-direct.eosasia.one set contract crazytown.bp pomelo -p crazytown.bp@active
@@ -18,10 +20,10 @@ cleos wallet unlock --password PW5JaGpLtoM1vtD1WxiAC4RDsr82FRUczmKgocw1KJZqVahB4
 #cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "crazytown.bp", "0.0100 EOS", "0.0100 PUB" ]' -p minakokojima@active
 
 
-cleos -u http://api-direct.eosasia.one get table eosotcbackup dacincubator order
-cleos -u http://api-direct.eosasia.one get table eosotcbackup youyouyouyou order
-cleos -u http://api-direct.eosasia.one get table eosotcbackup eosio.token order
-cleos -u http://api-direct.eosasia.one get table -l 65536 eosotcbackup eosio.token order
+#cleos -u http://api-direct.eosasia.one get table eosotcbackup dacincubator order
+#cleos -u http://api-direct.eosasia.one get table eosotcbackup youyouyouyou order
+#cleos -u http://api-direct.eosasia.one get table eosotcbackup eosio.token order
+#cleos -u http://api-direct.eosasia.one get table -l 65536 eosotcbackup eosio.token order
 
 
 # cleos -u https://api-kylin.eosasia.one push action pomelodex111 test '[]' -p minakokojima@active
