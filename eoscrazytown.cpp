@@ -1,4 +1,4 @@
-#include "eoscrazytown.hpp"
+ #include "eoscrazytown.hpp"
 
 // @abi action
 void eoscrazytown::init(const checksum256& hash) {
@@ -19,7 +19,7 @@ void eoscrazytown::test(){
 
 }
 
-auto eoscrazytown::checkBets( const asset eos, const string memo,
+auto eoscrazytown::checkBets( const asset &eos, const string &memo,
                               vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
     vbets = getBets( memo, ' ' ) ;
     totalBets = getTotalBets( vbets ) ;    
@@ -27,7 +27,7 @@ auto eoscrazytown::checkBets( const asset eos, const string memo,
 }
 
 // input
-void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, string memo) {        
+void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, string &memo) {        
     if (to != _self) return ;
 
     require_auth(from);
@@ -54,7 +54,7 @@ void eoscrazytown::onTransfer(account_name from, account_name to, asset eos, str
 }
 
 
-auto eoscrazytown::getResult( const card a,  const card b ) {
+auto eoscrazytown::getResult( const card &a,  const card &b ) {
     string result = "XXXXXXXXXXX" ;
     const char o = 'O' ;
     auto aS = a / 13 ;
@@ -91,17 +91,14 @@ const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { //
     return vbets ;
 }
 
-auto eoscrazytown::getBeton( const vector<int64_t> v ) {
+auto eoscrazytown::getBeton( const vector<int64_t> &v ) {
     string beton = "" ;
-    for(auto n:v) {
-        if ( n != 0 ) beton+='O';
-        else beton+='X' ;
-    }
+    for(auto n:v) beton+= ( n != 0 ) ? 'O' : 'X' ;
     
     return beton;
 }
 
-const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
+const int64_t eoscrazytown::getTotalBets(const vector<int64_t> &v) {
     int64_t totalBets = 0 ;
     for (auto n:v) totalBets += n ;
 
@@ -109,38 +106,37 @@ const int64_t eoscrazytown::getTotalBets(const vector<int64_t> v) {
 }
 
 // Output
-void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){
+void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // hash for next round
     require_auth(_self);
 
     auto result = getResult( seed.hash[ 0 ] % 52, seed.hash[ 1 ] % 52 ) ;         
 
     string beton ;
     // string presult ;
-    vector<int64_t> bets ;
+    // vector<int64_t> &bets ;
     asset payout = asset(0, EOS_SYMBOL);
     int64_t bonus ;
     const char o = 'O' ;
-    for ( auto p = begin(players) ; p != end(players) ; ++p ) {
-        beton = getBeton( p->vbets ) ;
-        bets = p->vbets ;
+    for (const auto& p : players ) {
+        auto bets = p.vbets ;
+        beton = getBeton( bets ) ;
+    
         bonus = 0 ;
         // exp:
         // r 2.0: O X X X X X X X X X X // no space !
         // beton: O X X O X X O X O O O // no space !
         if ( result[2] == o ) { // (3) draw
             if ( result[2] == beton[2] ) bonus += bets[2] + bets[2] * DRAW ; // (3)
-            // presult += 'x' ; 
 
             return ;
         }
         else { 
             if ( result[0] == beton[0] ) {
-                // presult += 'w' ; // win 
                 bonus += bets[0] + bets[0] * SIDE ; // (1)
             }
             else {
-                // presult += 'l' ; // lose
-                bonus += bets[1] + bets[1] * SIDE ; // (2)
+               if ( result[1] == beton[1] ) bonus += bets[1] + bets[1] * SIDE ; // (2)
+
             }
     
             if ( result[3] == beton[3] ) bonus += bets[3] + bets[3] * COLOR ; // (4)
@@ -160,13 +156,11 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){
         action( // winner winner chicken dinner
             permission_level{_self, N(active)},
             _self, N(transfer),
-            make_tuple(_self, p->account, asset(bonus, EOS_SYMBOL),
+            make_tuple(_self, p.account, asset(bonus, EOS_SYMBOL),
                 std::string("winner winner chicken dinner") )
         ).send();
 
-        auto g = _global.get();    
-        g.hash = hash;
-        _global.set(g, _self);
     }
 
+    init( hash ) ;
 }
