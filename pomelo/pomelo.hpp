@@ -42,7 +42,7 @@ public:
                   asset        quantity,
                   string       memo);                 
 
-    // @abi table
+    // @abi table buyorder i64
     struct buyorder { 
         uint64_t id;
         account_name account;
@@ -59,7 +59,7 @@ public:
         indexed_by<N(byprice), const_mem_fun<buyorder, uint64_t, &buyorder::get_price>>
     > buyorders;
 
-    // @abi table
+    // @abi table sellorder i64
     struct sellorder {
         uint64_t id;
         account_name account;
@@ -88,7 +88,7 @@ public:
     }    
 
     // @abi action
-    void sellrecepit(sellorder t) {
+    void sellreceipt(sellorder t) {
         require_auth(_self);
     }   
 
