@@ -5,12 +5,12 @@
 using namespace eosio;
 using namespace std;
 
-// @abi
+// @abi table bets i64
 struct rec_reveal {
-        uint8_t dragon ;
-        uint8_t tiger ;
-        checksum256 server_hash;
-        checksum256 client_seed;
+    uint8_t dragon ;
+    uint8_t tiger ;
+    checksum256 server_hash;
+    checksum256 client_seed;
 };
 
 const vector<string> explode(const string& s, const char& c) {

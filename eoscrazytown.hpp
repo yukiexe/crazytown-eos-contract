@@ -57,6 +57,10 @@ class eoscrazytown : public eosio::contract {
                     asset          &quantity,
                     string         &memo);
 
+    // @abi action
+    void receipt(const rec_reveal& reveal) {
+        require_auth(_self);
+    }
 
     // @abi table global
     struct st_global {       
