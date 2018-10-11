@@ -3,15 +3,19 @@
 // @abi action
 void eoscrazytown::init(const checksum256& hash) {
     require_auth( _self );
+    
+    clear() ;
+
     auto g = _global.get_or_create( _self, st_global{.hash = hash});    
     g.hash = hash;
-    _global.set(g, _self);
-
-    clear() ;
+    _global.set(g, _self); 
 }
 // @abi action
 void eoscrazytown::clear() {
     require_auth(_self);
+
+   //  _global.remove(); 
+
     while (players.begin() != players.end()) {
         players.erase(players.begin());
     }
@@ -191,7 +195,13 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
         .server_hash = _global.get().hash,
         .client_seed = seed,
     }; 
-    
+    /*
+    // singleton -> _global 
+    auto g = _global.get();    
+    g.dragon = dragon ;
+    g.tiger = tiger ;
+    _global.set(g, _self);
+    */
     action( // give result to client
             permission_level{_self, N(active)},
             _self, N(receipt), _reveal
@@ -245,15 +255,29 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
 
         }
 
-        if ( bonus != 0 )
+        
         action( // winner winner chicken dinner
             permission_level{_self, N(active)},
             _self, N(transfer),
-            make_tuple(_self, p.account, asset(bonus, EOS_SYMBOL),
-                std::string("winner winner chicken dinner") )
+            make_tuple( _self, p.account, asset(bonus, EOS_SYMBOL),
+                        bonus != 0 ? string("Winner Winner Chicken Dinner") : 
+                              string("Better Luck Next Time") )
         ).send();
+
+
 
     }
 
-    init( hash ) ;
-}
+    auto g = _global.get_or_create( _self, st_global{.hash = hash});    
+    g.hash = hash;
+    g.dragon = dragon ;
+    g.tiger = tiger ;
+    _global.set(g, _self);
+
+    while (players.begin() != players.end()) {
+        players.erase(players.begin());
+    }
+
+    
+    // init( hash ) ;
+} 
