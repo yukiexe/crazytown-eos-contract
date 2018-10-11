@@ -24,6 +24,7 @@
         "__functional_base": "cpp",
         "memory": "cpp",
         "tuple": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "stdexcept": "cpp"
     }
 }

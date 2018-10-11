@@ -1,16 +1,14 @@
 cleos wallet unlock --password PW5JaGpLtoM1vtD1WxiAC4RDsr82FRUczmKgocw1KJZqVahB4LZ1u
-
+#
 #/usr/local/eosio/bin/eosiocpp -g pomelo/pomelo.abi pomelo/pomelo.cpp
 /usr/local/eosio/bin/eosiocpp -o pomelo/pomelo.wast pomelo/pomelo.cpp
 
 #
-#cleos -u http://api-direct.eosasia.one set contract crazytown.bp pomelo -p crazytown.bp@active
-
-cleos -u http://api-direct.eosasia.one set contract kyubeydex.bp pomelo -p kyubeydex.bp@active
+#cleos -u http://api-direct.eosasia.one set contract kyubeydex.bp pomelo -p kyubeydex.bp@active
 
 
 
-#cleos -u http://api-direct.eosasia.one push action crazytown.bp setwhitelist '["PXL", "dacincubator"]' -p crazytown.bp@active
+#cleos -u http://api-direct.eosasia.one push action kyubeydex.bp setwhitelist '["PXL", "dacincubator"]' -p kyubeydex.bp@active
 
 #cleos -u http://api-direct.eosasia.one push action crazytown.bp rmwhitelist '["PXL"]' -p crazytown.bp@active
 
@@ -22,16 +20,18 @@ cleos -u http://api-direct.eosasia.one set contract kyubeydex.bp pomelo -p kyube
 
 
 #
-cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "kyubeydex.bp", "0.0100 EOS", "0.0100 KBY" ]' -p minakokojima@active
+#cleos -u http://api-direct.eosasia.one push action eosio.token transfer '[ "minakokojima", "kyubeydex.bp", "0.0100 EOS", "0.0100 KBY" ]' -p minakokojima@active
 #
-# cleos -u http://api-direct.eosasia.one push action dacincubator transfer '[ "eosotcbackup", "kyubeydex.bp", "0.0050 PXL", "0.0050 EOS" ]' -p eosotcbackup@active
+# 
+#cleos -u http://api-direct.eosasia.one push action dacincubator transfer '[ "eosotcbackup", "kyubeydex.bp", "0.0050 PXL", "0.0050 EOS" ]' -p eosotcbackup@active kyubeydex.bp@active
 
 
+cleos -u http://api-direct.eosasia.one push action crazytown.bp transfer '[ "minakokojima", "1.0000 EOS" ]' -p crazytown.bp@active minakokojima@active
 
 #crazytown.bp PXL whitelist
 
 
-
+cleos -u http://api-direct.eosasia.one get table dacincubator dacincubator accounts
 
 #cleos -u http://api-direct.eosasia.one get table kyubeydex.bp PXL buyorder
 

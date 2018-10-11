@@ -67,8 +67,6 @@ class eoscrazytown : public eosio::contract {
     struct st_global {       
         uint64_t defer_id = 0;
         checksum256 hash;
-        uint8_t dragon ;
-        uint8_t tiger ;
     };
     typedef singleton<N(global), st_global> singleton_global;
     singleton_global _global;         
@@ -88,13 +86,23 @@ class eoscrazytown : public eosio::contract {
     // @abi action
   void newbag(account_name &from, asset &eos);
 
+      // @abi action
+  void setslogan(account_name &from, uint64_t id,string memo) {
+      auto itr = bags.find(id);
+      eosio_assert(from == itr->owner, "not the owner");
+         bags.modify(itr, from, [&](auto& t) {
+            t.slogal  = memo;
+        });
+  }
+
 
 
         // @abi table bag i64
         struct bag {
-            uint64_t id;            
+            uint64_t id;         
             account_name owner;
             uint64_t price;
+            string slogan;
 
             uint64_t primary_key() const { return id; }
             uint64_t next_price() const {
