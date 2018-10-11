@@ -189,6 +189,20 @@ void pomelo::buy(account_name account, asset bid, asset ask)
         // Retrive issue contract of this token
         auto token_contract = get_contract_name_by_symbol(ask.symbol);
 
+        match_record m;
+        m.id = itr->id;
+        m.bidder = account;        
+        m.asker = itr->account;
+        m.bid = asset(sold_eos, EOS);
+        m.ask = asset(sold_token, ask.symbol);
+        m.unit_price = order_unit_price;
+        m.timestamp = now();
+
+        action(
+            permission_level{ _self, N(active) },
+            _self, N(matchreceipt), m
+        ).send();  
+            
         // Transfer EOS to seller
         action(
             permission_level{ _self, N(active) },
@@ -274,6 +288,20 @@ void pomelo::sell(account_name account, asset bid, asset ask)
         // Retrive issue contract of this token
         auto token_contract = get_contract_name_by_symbol(bid.symbol);
 
+        match_record m;
+        m.id = itr->id;
+        m.bidder = itr->account;
+        m.asker = account;
+        m.bid = asset(sold_token * order_unit_price, EOS);
+        m.ask = asset(sold_token, bid.symbol);
+        m.unit_price = order_unit_price;
+        m.timestamp = now();
+
+        action(
+            permission_level{ _self, N(active) },
+            _self, N(matchreceipt), m
+        ).send();  
+            
         // Transfer EOS to seller
         action(
             permission_level{ _self, N(active) },

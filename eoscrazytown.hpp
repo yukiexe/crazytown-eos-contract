@@ -32,7 +32,8 @@ class eoscrazytown : public eosio::contract {
         eoscrazytown(account_name self) :
         contract(self),
         _global(_self, _self), //  
-        players(_self, _self) {}
+        players(_self, _self) ,
+        bags(_self,_self){}
 
 
     // @abi action
@@ -81,7 +82,26 @@ class eoscrazytown : public eosio::contract {
     player_index players;  
 
     
-    void apply(account_name code, action_name action);       
+    void apply(account_name code, action_name action);
+    // @abi action
+  void newbag(account_name &from, asset &eos);
+
+
+
+        // @abi table bag i64
+        struct bag {
+            uint64_t id;
+            account_name owner;
+            uint64_t price;
+
+            uint64_t primary_key() const { return id; }
+            uint64_t next_price() {
+                return price * 1.35;
+            }
+        };
+        typedef eosio::multi_index<N(bag), bag> bag_index;
+        bag_index bags;   
+
   
 private:
     const vector<int64_t> getBets(const string &s, const char &c) ;
@@ -107,7 +127,7 @@ void eoscrazytown::apply(account_name code, action_name action) {
 
     if (code != _self) return;
     switch (action) {
-        EOSIO_API(eoscrazytown, (init)(test)(clear)(reveal));
+        EOSIO_API(eoscrazytown, (init)(test)(clear)(reveal)(newbag) );
     };
 }
 

@@ -28,16 +28,67 @@ auto eoscrazytown::checkBets( const asset &eos, const string &memo,
     return eos.amount == totalBets ;
 }
 
+void eoscrazytown::newbag(account_name &from, asset &eos) {    
+
+        require_auth(_self);
+
+          bags.emplace(from, [&](auto& p) {
+          
+        p.id =  bags.available_primary_key();
+            p.owner = from;
+            p.price = eos.amount ;
+        });
+}
+
 // input
 void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, string &memo) {        
     if (to != _self) return ;
 
     require_auth(from);
-    eosio_assert(eos.is_valid(), "Invalid token transfer");
+    eosio_assert(eos.is_valid(), "Invalid token transfer...");
     eosio_assert(eos.symbol == EOS_SYMBOL, "only EOS token is allowed");
     eosio_assert(eos.amount > 0, "must bet a positive amount");
     eosio_assert(memo != "" , "must have bets in memo") ;
-    eosio_assert(memo.size() >= 21  , "bets wrong") ;
+    eosio_assert(memo.size() >= 21  , "bets wrong...") ;
+
+    if(memo.substr(0,3)=="buy"){
+        memo.erase(0,4);
+         std::size_t s = memo.find(' ');  
+             
+        auto id = string_to_price(memo.substr(0, s));
+        memo.erase(0, s+1);        
+        auto itr = bags.find(id);
+        eosio_assert(eos.amount >= itr->price,"no enough price");
+       auto ref_b=eos;
+                    ref_b.amount /=10; 
+        auto ref = eosio::string_to_name(memo.c_str());
+                if (is_account(ref)) {
+                                
+
+                    action( // winner winner chicken dinner
+                        permission_level{_self, N(active)},
+                        _self, N(transfer),
+                        make_tuple(_self, ref, ref_b,
+                            std::string("ref bonus") )
+                    ).send();
+            
+                }
+        eos.amount-=ref_b.amount * 5;
+
+        action( // winner winner chicken dinner
+            permission_level{_self, N(active)},
+            _self, N(transfer),
+            make_tuple(_self, itr->owner,eos,
+                std::string("next hodl") )
+        ).send();
+
+        bags.modify(itr, from, [&](auto& t) {
+            t.owner = from;
+            t.price = t.next_price();
+        });
+        
+        return;
+    }
     
     // todo: input check non-num
     vector<int64_t> vbets ;

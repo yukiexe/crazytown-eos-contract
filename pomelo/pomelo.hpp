@@ -92,6 +92,21 @@ public:
         require_auth(_self);
     }   
 
+    struct match_record {
+        uint64_t id;
+        account_name bidder;
+        account_name asker;
+        asset bid;
+        asset ask;
+        uint64_t unit_price;
+        time timestamp;
+    };    
+
+    // @abi action
+    void matchreceipt(match_record t) {
+        require_auth(_self);
+    }       
+
 private:
     uint64_t my_string_to_symbol(uint8_t precision, const char* str);
     bool is_valid_unit_price(uint64_t eos, uint64_t non_eos);
