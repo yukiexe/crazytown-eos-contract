@@ -81,19 +81,13 @@ class eoscrazytown : public eosio::contract {
     typedef eosio::multi_index<N(player), player> player_index;
     player_index players;  
 
-    
     void apply(account_name code, action_name action);
-    // @abi action
+
+  // @abi action
   void newbag(account_name &from, asset &eos);
 
-      // @abi action
-  void setslogan(account_name &from, uint64_t id,string memo) {
-      auto itr = bags.find(id);
-      eosio_assert(from == itr->owner, "not the owner");
-         bags.modify(itr, from, [&](auto& t) {
-            t.slogal  = memo;
-        });
-  }
+  // @abi action
+  void setslogan(account_name &from, uint64_t id,string memo);
 
 
 
@@ -137,7 +131,7 @@ void eoscrazytown::apply(account_name code, action_name action) {
 
     if (code != _self) return;
     switch (action) {
-        EOSIO_API(eoscrazytown, (init)(test)(clear)(reveal)(newbag) );
+        EOSIO_API(eoscrazytown, (init)(test)(clear)(reveal)(newbag)(setslogan) );
     };
 }
 

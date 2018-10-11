@@ -1,4 +1,4 @@
- #include "eoscrazytown.hpp"
+ #include "crazytown.hpp"
 
 // @abi action
 void eoscrazytown::init(const checksum256& hash) {
@@ -43,6 +43,15 @@ void eoscrazytown::newbag(account_name &from, asset &eos ) {
         });
 }
 
+
+void eoscrazytown::setslogan(account_name &from, uint64_t id,string memo) {
+    auto itr = bags.find(id);
+    eosio_assert(from == itr->owner, "not the owner...");
+        bags.modify(itr, from, [&](auto& t) {
+        t.slogan  = memo;
+    });
+}
+
 // input
 void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, string &memo) {        
     if (to != _self) return ;
@@ -50,15 +59,22 @@ void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, 
     require_auth(from);
     eosio_assert(eos.is_valid(), "Invalid token transfer...");
     eosio_assert(eos.symbol == EOS_SYMBOL, "only EOS token is allowed");
-    eosio_assert(eos.amount > 0, "must bet a positive amount");
-    eosio_assert(memo != "" , "must have bets in memo") ;
-    eosio_assert(memo.size() >= 21  , "bets wrong...") ;
+    eosio_assert(eos.amount > 0, "must buy a positive amount");
+//    eosio_assert(memo != "" , "must have something in memo") ;
+//    eosio_assert(memo.size() >= 21  , "bets wrong...") ;
 
     if(memo.substr(0,3)=="buy"){
+
+    
         memo.erase(0,4);
-         std::size_t s = memo.find(' ');  
+         std::size_t s = memo.find(' '); 
+         if (s == string::npos) {
+             s = memo.size();
+         }
+          
              
         auto id = string_to_price(memo.substr(0, s));
+      //  auto id = 0;
         memo.erase(0, s+1);        
         auto itr = bags.find(id);
         eosio_assert(eos.amount >= itr->next_price(),"no enough eos");
@@ -91,10 +107,10 @@ void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, 
             make_tuple(_self, itr->owner, delta,
                 std::string("next hodl") )
         ).send();
-
-        bags.modify(itr, from, [&](auto& t) {
+    
+        bags.modify(itr, 0, [&](auto& t) {
             t.owner = from;
-            t.price = t.next_price();
+            t.price = eos.amount;
         });
         
         return;
