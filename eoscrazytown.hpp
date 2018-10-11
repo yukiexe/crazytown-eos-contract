@@ -95,7 +95,7 @@ class eoscrazytown : public eosio::contract {
             uint64_t price;
 
             uint64_t primary_key() const { return id; }
-            uint64_t next_price() {
+            uint64_t next_price() const {
                 return price * 1.35;
             }
         };

@@ -58,9 +58,13 @@ void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, 
         auto id = string_to_price(memo.substr(0, s));
         memo.erase(0, s+1);        
         auto itr = bags.find(id);
-        eosio_assert(eos.amount >= itr->price,"no enough price");
-       auto ref_b=eos;
-                    ref_b.amount /=10; 
+        eosio_assert(eos.amount >= itr->next_price(),"no enough eos");
+        asset d(itr->next_price(),EOS_SYMBOL);
+
+        d.amount -= itr->price;
+
+       auto ref_b= d;
+        ref_b.amount /=10; 
         auto ref = eosio::string_to_name(memo.c_str());
                 if (is_account(ref)) {
                                 
@@ -73,12 +77,15 @@ void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, 
                     ).send();
             
                 }
-        eos.amount-=ref_b.amount * 5;
+        d.amount-=ref_b.amount * 5;
+
+        auto delta = d;
+        delta.amount += itr->price;
 
         action( // winner winner chicken dinner
             permission_level{_self, N(active)},
             _self, N(transfer),
-            make_tuple(_self, itr->owner,eos,
+            make_tuple(_self, itr->owner, delta,
                 std::string("next hodl") )
         ).send();
 
