@@ -66,6 +66,8 @@ class eoscrazytown : public eosio::contract {
     struct st_global {       
         uint64_t defer_id = 0;
         checksum256 hash;
+        uint8_t dragon ;
+        uint8_t tiger ;
     };
     typedef singleton<N(global), st_global> singleton_global;
     singleton_global _global;         
