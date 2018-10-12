@@ -5,7 +5,11 @@ cleos -u http://api-direct.eosasia.one set contract crazytown.bp eoscrazytown -p
 cleos -u http://api-direct.eosasia.one push action crazytown.bp init '["0196d5b5d9ec1bc78ba927d2db2cb327d836f002601c77bd8c3f144a07ddc737"]' -p crazytown.bp@active
 
 cleos -u http://api-direct.eosasia.one push action crazytown.bp reveal '["0196d5b5d9ec1bc78ba927d2db2cb327d836f002601c77bd8c3f144a07ddc737","0196d5b5d9ec1bc78ba927d2db2cb327d836f002601c77bd8c3f144a07ddc737"]' -p crazytown.bp@active
+
+
+cleos -u http://api-direct.eosasia.one push action crazytown.bp clear '[]' -p crazytown.bp@active
  
+
 #cleos -u http://api-direct.eosasia.one push action crazytown.bp setwhitelist '["PXL", "dacincubator"]' -p crazytown.bp@active
 
 #cleos -u http://api-direct.eosasia.one push action crazytown.bp rmwhitelist '["PXL"]' -p crazytown.bp@active
@@ -18,9 +22,11 @@ cleos -u http://api-direct.eosasia.one push action crazytown.bp reveal '["0196d5
 
 cleos -u http://api-direct.eosasia.one get table crazytown.bp crazytown.bp global
 
-#cleos -u http://api-direct.eosasia.one get table eosotcbackup dacincubator order
-#cleos -u http://api-direct.eosasia.one get table eosotcbackup youyouyouyou order
-#cleos -u http://api-direct.eosasia.one get table eosotcbackup eosio.token order
+cleos -u http://api-direct.eosasia.one get table crazytown.bp crazytown.bp player
+
+
+cleos -u http://api-direct.eosasia.one get table crazytown.bp crazytown.bp bags
+
 #cleos -u http://api-direct.eosasia.one get table -l 65536 eosotcbackup eosio.token order
 
 

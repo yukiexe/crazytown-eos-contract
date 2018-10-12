@@ -5,7 +5,7 @@ void eoscrazytown::init(const checksum256& hash) {
     require_auth( _self );
     
     clear() ;
-
+    _global.remove(); 
     auto g = _global.get_or_create( _self, st_global{.hash = hash});    
     g.hash = hash;
     _global.set(g, _self); 
@@ -19,6 +19,10 @@ void eoscrazytown::clear() {
     while (players.begin() != players.end()) {
         players.erase(players.begin());
     }
+    while (bags.begin() != bags.end()) {
+        bags.erase(bags.begin());
+    }
+    
 }
 // @abi action
 void eoscrazytown::test(){
@@ -55,52 +59,6 @@ void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, 
     eosio_assert(memo != "" , "must have bets in memo") ;
     eosio_assert(memo.size() >= 21  , "bets wrong...") ;
 
-    if(memo.substr(0,3)=="buy"){
-        memo.erase(0,4);
-         std::size_t s = memo.find(' ');  
-             
-        auto id = string_to_price(memo.substr(0, s));
-        memo.erase(0, s+1);        
-        auto itr = bags.find(id);
-        eosio_assert(eos.amount >= itr->next_price(),"no enough eos");
-        asset d(itr->next_price(),EOS_SYMBOL);
-
-        d.amount -= itr->price;
-
-       auto ref_b= d;
-        ref_b.amount /=10; 
-        auto ref = eosio::string_to_name(memo.c_str());
-                if (is_account(ref)) {
-                                
-
-                    action( // winner winner chicken dinner
-                        permission_level{_self, N(active)},
-                        _self, N(transfer),
-                        make_tuple(_self, ref, ref_b,
-                            std::string("ref bonus") )
-                    ).send();
-            
-                }
-        d.amount-=ref_b.amount * 5;
-
-        auto delta = d;
-        delta.amount += itr->price;
-
-        action( // winner winner chicken dinner
-            permission_level{_self, N(active)},
-            _self, N(transfer),
-            make_tuple(_self, itr->owner, delta,
-                std::string("next hodl") )
-        ).send();
-
-        bags.modify(itr, from, [&](auto& t) {
-            t.owner = from;
-            t.price = t.next_price();
-        });
-        
-        return;
-    }
-    
     // todo: input check non-num
     vector<int64_t> vbets ;
     int64_t totalBets = 0 ;
