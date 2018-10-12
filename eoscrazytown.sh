@@ -5,10 +5,13 @@ cleos -u http://api-direct.eosasia.one set contract crazytown.bp eoscrazytown -p
 cleos -u http://api-direct.eosasia.one push action crazytown.bp init '["0196d5b5d9ec1bc78ba927d2db2cb327d836f002601c77bd8c3f144a07ddc737"]' -p crazytown.bp@active
 
 cleos -u http://api-direct.eosasia.one push action crazytown.bp reveal '["0196d5b5d9ec1bc78ba927d2db2cb327d836f002601c77bd8c3f144a07ddc737","0196d5b5d9ec1bc78ba927d2db2cb327d836f002601c77bd8c3f144a07ddc737"]' -p crazytown.bp@active
+cleos -u http://api-direct.eosasia.one push action crazytown.bp reveal '["7a2dee663b23200c63fe195f76c9cb0f255ff623e578134060dd3fbc9dfd06a2","7f86a67f22e04c1ff4a21ade119ec95f8e618b06588b160ee68035544eb40014"]' -p crazytown.bp@active
+cleos -u https://api.franceos.fr:443 push action crazytown.bp reveal '["7a2dee663b23200c63fe195f76c9cb0f255ff623e578134060dd3fbc9dfd06a2","7f86a67f22e04c1ff4a21ade119ec95f8e618b06588b160ee68035544eb40014"]' -p crazytown.bp@active
 
 
 cleos -u http://api-direct.eosasia.one push action crazytown.bp clear '[]' -p crazytown.bp@active
  
+ https://api.franceos.fr:443
 
 #cleos -u http://api-direct.eosasia.one push action crazytown.bp setwhitelist '["PXL", "dacincubator"]' -p crazytown.bp@active
 
@@ -24,6 +27,7 @@ cleos -u http://api-direct.eosasia.one get table crazytown.bp crazytown.bp globa
 
 cleos -u http://api-direct.eosasia.one get table crazytown.bp crazytown.bp player
 
+cleos -u https://geo.eosasia.one get table crazytown.bp crazytown.bp player
 
 cleos -u http://api-direct.eosasia.one get table crazytown.bp crazytown.bp bags
 
