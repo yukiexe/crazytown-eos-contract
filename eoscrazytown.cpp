@@ -57,7 +57,14 @@ void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, 
     vector<int64_t> vbets ;
     int64_t totalBets = 0 ;
     eosio_assert( eoscrazytown::checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
-    // eosio_assert( totalBets <= token::get_balance( _self, EOS_SYMBOL ) / 20, "Bets too big");
+    eosio_assert( totalBets >= 1, "Bets should >= 1=");
+    eosio_assert( totalBets <= 100, "Bets should not > 100");
+
+    const auto& sym = eosio::symbol_type(EOS_SYMBOL).name();
+    accounts eos_account(N(eosio.token), _self);
+    auto old_balance = eos_account.get(sym).balance;
+
+    eosio_assert( totalBets <= old_balance.amount / 20, "Bets too big");
     auto itr = players.find(from);
     if (itr == players.end()) {
         players.emplace(_self, [&](auto& p) {
@@ -163,7 +170,7 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
     auto result = getResult( _reveal.dragon, _reveal.tiger ) ;         
 
     string beton ;
-    // string presult ;
+    string presult = "" ;
     int64_t bonus ;
     const char o = 'O' ;
     for (const auto& p : players ) {
@@ -171,6 +178,7 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
         beton = getBeton( bets ) ;
     
         bonus = 0 ;
+        presult = "" ;
         // exp:
         // r 2.0: O X X X X X X X X X X // no space !
         // beton: O X X O X X O X O O O // no space !
@@ -188,25 +196,54 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
         }
         else { 
             if ( result[0] == o ) {
-                if ( result[0] == beton[0] ) bonus += bets[0] + bets[0] * SIDE ; // (1)  
+                if ( result[0] == beton[0] ) {
+                    bonus += bets[0] + bets[0] * SIDE ; // (1)
+                    presult += '1' ;
+                }  
             }
             else { // result[1] == o
-               if ( result[1] == beton[1] ) bonus += bets[1] + bets[1] * SIDE ; // (2)
-
+                if ( result[1] == beton[1] ) {
+                    bonus += bets[1] + bets[1] * SIDE ; // (2)
+                    presult += '2' ;
+                }
             }
     
-            if ( result[3] == beton[3] ) bonus += bets[3] + bets[3] * COLOR ; // (4)
-            if ( result[4] == beton[4] ) bonus += bets[4] + bets[4] * COLOR ; // (5)
+            if ( result[3] == beton[3] ) {
+                bonus += bets[3] + bets[3] * COLOR ; // (4)
+                presult += '4' ;
+            }
+            
+            if ( result[4] == beton[4] ) {
+                bonus += bets[4] + bets[4] * COLOR ; // (5)
+                presult += '5' ;
+            } 
 
-            if ( result[5] == beton[5] ) bonus += bets[5] + bets[5] * COLOR ; // (6)
-            if ( result[6] == beton[6] ) bonus += bets[6] + bets[6] * COLOR ; // (7)
+            if ( result[5] == beton[5] ) {
+                bonus += bets[5] + bets[5] * COLOR ; // (6)
+                presult += '6' ;
+            } 
+            if ( result[6] == beton[6] ) {
+                bonus += bets[6] + bets[6] * COLOR ; // (7)
+                presult += '7' ;
+            }
+            
 
-            if ( result[7] == beton[7] )  bonus += bets[7] + bets[7] * ODD ; // (8)
-            if ( result[8] == beton[8] )  bonus += bets[8] + bets[8] * EVEN ; // (9)
-
-            if ( result[9] == beton[9] )  bonus += bets[9] + bets[9] * ODD ; // (10)
-            if ( result[10] == beton[10] )  bonus += bets[10] + bets[10] * EVEN ; // (11)
-
+            if ( result[7] == beton[7] ) {  
+                bonus += bets[7] + bets[7] * ODD ; // (8)
+                presult += '8' ;
+            }
+            if ( result[8] == beton[8] ) {
+                bonus += bets[8] + bets[8] * EVEN ; // (9)
+                presult += '9' ;
+            }
+            if ( result[9] == beton[9] ) {
+                bonus += bets[9] + bets[9] * ODD ; // (10)
+                presult += 'A' ;
+            }
+            if ( result[10] == beton[10] ) {
+                bonus += bets[10] + bets[10] * EVEN ; // (11)
+                presult += 'B' ;
+            }
         }
 
         
@@ -214,7 +251,7 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
             permission_level{_self, N(active)},
             TOKEN_CONTRACT, N(transfer),
             make_tuple( _self, p.account, asset(bonus, EOS_SYMBOL),
-                        bonus != 0 ? string("Winner Winner Chicken Dinner") : 
+                        bonus != 0 ? string("Winner Winner Chicken Dinner. " + presult ) : 
                               string("Better Luck Next Time") )
         ).send();
 

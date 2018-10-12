@@ -6,12 +6,12 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
 #include <eosiolib/singleton.hpp>
-// #include <eosio.token.hpp>
 // #include <cmath>
 // #include <string>
 
 #include "config.hpp"
 #include "utils.hpp"
+// #include "eosio.token.hpp"
  
 #define EOS_SYMBOL S(4, EOS)
 #define TOKEN_CONTRACT N(eosio.token)
