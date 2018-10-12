@@ -4,8 +4,8 @@
 void eoscrazytown::init(const checksum256& hash) {
     require_auth( _self );
     
-    clear() ;
-    _global.remove(); 
+    // clear() ;
+    // _global.remove(); 
     auto g = _global.get_or_create( _self, st_global{.hash = hash});    
     g.hash = hash;
     _global.set(g, _self); 
@@ -14,15 +14,20 @@ void eoscrazytown::init(const checksum256& hash) {
 void eoscrazytown::clear() {
     require_auth(_self);
 
-   //  _global.remove(); 
+    //_global.remove(); 
 
-    while (players.begin() != players.end()) {
-        players.erase(players.begin());
-    }
-    while (bags.begin() != bags.end()) {
-        bags.erase(bags.begin());
-    }
+        // multi_index can't erase when the format changed
+        auto it = db_lowerbound_i64(_self, _self, N(global), 0);
+        while (it >= 0) {
+            auto del = it;
+            uint64_t dummy;
+            it = db_next_i64(it, &dummy);
+            db_remove_i64(del);
+}
     
+    //while (players.begin() != players.end()) {
+    //    players.erase(players.begin());
+    // }
 }
 // @abi action
 void eoscrazytown::test(){
@@ -34,18 +39,6 @@ auto eoscrazytown::checkBets( const asset &eos, const string &memo,
     vbets = getBets( memo, ',' ) ;
     totalBets = getTotalBets( vbets ) ;    
     return eos.amount == totalBets ;
-}
-
-void eoscrazytown::newbag(account_name &from, asset &eos) {    
-
-        require_auth(_self);
-
-          bags.emplace(from, [&](auto& p) {
-          
-        p.id =  bags.available_primary_key();
-            p.owner = from;
-            p.price = eos.amount ;
-        });
 }
 
 // input
@@ -216,7 +209,7 @@ void eoscrazytown::reveal(const checksum256& seed, const checksum256& hash){ // 
         
         action( // winner winner chicken dinner
             permission_level{_self, N(active)},
-            _self, N(transfer),
+            TOKEN_CONTRACT, N(transfer),
             make_tuple( _self, p.account, asset(bonus, EOS_SYMBOL),
                         bonus != 0 ? string("Winner Winner Chicken Dinner") : 
                               string("Better Luck Next Time") )

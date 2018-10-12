@@ -5,7 +5,6 @@
 using namespace eosio;
 using namespace std;
 
-// @abi table bets i64
 struct rec_reveal {
     uint8_t dragon ;
     uint8_t tiger ;
