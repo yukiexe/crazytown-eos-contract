@@ -1,4 +1,4 @@
- #include "eoscrazytown.hpp"
+#include "eoscrazytown.hpp"
 
 // @abi action
 void eoscrazytown::init(const checksum256& hash) {
@@ -85,6 +85,8 @@ auto eoscrazytown::getResult( const card &a,  const card &b ) {
     auto bS = b / 13 ;
     auto aP = a % 13 ;
     auto bP = b % 13 ;
+    aP ++;
+    bP ++;
 
     if ( aP > bP ) result[0] = o ; // (1)
     else if ( aP < bP ) result[1] = o ; // (2)
@@ -131,7 +133,7 @@ const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { //
 
 auto eoscrazytown::getBeton( const vector<int64_t> &v ) {
     string beton = "" ;
-    for(auto n:v) beton+= ( n != 0 ) ? 'O' : 'X' ;
+    for(auto n:v) beton+= ( n != 0 ) ? 'O' : 'n' ;
     
     return beton;
 }
