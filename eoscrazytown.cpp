@@ -14,7 +14,7 @@ void eoscrazytown::init(const checksum256& hash) {
 void eoscrazytown::clear() {
     require_auth(_self);
 
-    //_global.remove(); 
+    //_global.remove();
 
         // multi_index can't erase when the format changed
         auto it = db_lowerbound_i64(_self, _self, N(global), 0);
@@ -42,7 +42,7 @@ auto eoscrazytown::checkBets( const asset &eos, const string &memo,
 }
 
 // input
-void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, string &memo) {        
+void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, string &memo) {
     if (to != _self) return ;
 
     require_auth(from);
