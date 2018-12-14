@@ -25,6 +25,11 @@
         "memory": "cpp",
         "tuple": "cpp",
         "utility": "cpp",
+<<<<<<< Updated upstream
         "stdexcept": "cpp"
+=======
+        "atomic": "cpp",
+        "algorithm": "cpp"
+>>>>>>> Stashed changes
     }
 }

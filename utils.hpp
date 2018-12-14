@@ -1,4 +1,5 @@
 #pragma once
+#include <eosiolib/eosio.hpp>
 #include <string>
 #include <vector>
 
@@ -15,8 +16,17 @@ typedef eosio::multi_index<N(accounts), account> accounts;
 struct rec_reveal {
     uint8_t dragon ;
     uint8_t tiger ;
-    checksum256 server_hash;
-    checksum256 client_seed;
+    capi_checksum256 server_hash;
+    capi_checksum256 client_seed;
+};
+
+struct st_transfer {
+    name from;
+    name to;
+    asset        quantity;
+    string       memo;
+
+    EOSLIB_SERIALIZE( st_transfer, (from)(to)(quantity)(memo) )
 };
 
 const vector<string> explode(const string& s, const char& c) {
@@ -46,12 +56,13 @@ uint64_t string_to_price(string s) {
 uint64_t string_to_int(string s) {
     uint64_t z = 0;
     for (int i=0;i<s.size();++i) {
-        z += s[i] - '0';
-        z *= 10;
+        if ('0' <= s[i] && s[i] <= '9') {
+            z *= 10; 
+            z += s[i] - '0';
+        }
     }
     return z;
 }
-
 
 string int_to_string(uint64_t t) {
     if (t == 0) return "0";
@@ -64,17 +75,13 @@ string int_to_string(uint64_t t) {
     return z;
 }
 
-//bet 50 ludufutemp minakokojima
-
 class stringSplitter {
     public:
       stringSplitter(const string& _str) : str(_str) {
           current_position = 0;
       }
 
-      bool eof() {
-          return current_position == str.length();
-      }
+      bool eof() { return current_position == str.length(); }
 
       void skip_empty() {
           while (!eof() && str[current_position] == ' ') current_position ++;

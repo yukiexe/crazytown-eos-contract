@@ -13,21 +13,24 @@
 #include "utils.hpp"
 // #include "eosio.token.hpp"
  
-#define EOS_SYMBOL S(4, EOS)
-#define TOKEN_CONTRACT N(eosio.token)
+#define EOS_SYMBOL eosio::symbol("EOS", 4)
+#define TOKEN_CONTRACT "eosio.token"_n
 
 typedef double real_type;
 typedef uint8_t card ;
 
+using namespace std;
+using namespace eosio;
+
+CONTRACT eoscrazytown : public eosio::contract {
+    public:    
+        eoscrazytown( name receiver, name code, datastream<const char*> ds ) :
+        contract(receiver, code, ds),
+        _global(receiver, receiver.value), //  
+        players(receiver, receiver.value) {}
 
 
-using std::string;
-using eosio::symbol_name;
-using eosio::asset;
-using eosio::symbol_type;
-using eosio::permission_level;
-using eosio::action;
-
+<<<<<<< Updated upstream
 class eoscrazytown : public eosio::contract {
     public:    
         eoscrazytown(account_name self) :
@@ -50,42 +53,61 @@ class eoscrazytown : public eosio::contract {
     // @abi action
     void transfer(account_name   from,
                   account_name   to,
+=======
+    ACTION init(const capi_checksum256& hash);
+
+    ACTION clear();     
+
+    ACTION test();
+
+    ACTION verify( const capi_checksum256& seed, const capi_checksum256& hash );                        
+
+    ACTION reveal(const capi_checksum256& seed, const capi_checksum256& hash);
+
+    ACTION transfer(name   from,
+                  name   to,
+>>>>>>> Stashed changes
                   asset          quantity,
                   string         memo);
     
-    void onTransfer(account_name   &from,
-                    account_name   &to,
+    void onTransfer(name   &from,
+                    name   &to,
                     asset          &quantity,
                     string         &memo);
 
-    // @abi action
-    void receipt(const rec_reveal& reveal) {
-        require_auth(_self);
+    ACTION receipt(const rec_reveal& reveal) {
+        require_auth(get_self());
     }
 
-    // @abi table global
-    struct st_global {       
+    TABLE st_global {       
         uint64_t defer_id = 0;
+<<<<<<< Updated upstream
         checksum256 hash;
         uint8_t dragon ;
         uint8_t tiger ;
         EOSLIB_SERIALIZE( st_global, (defer_id)(hash)(dragon)(tiger)) ;
+=======
+        capi_checksum256 hash;
+>>>>>>> Stashed changes
     };
-    typedef singleton<N(global), st_global> singleton_global;
+    typedef singleton<"global"_n, st_global> singleton_global;
     singleton_global _global;         
 
-    // @abi table player
-    struct player {
-        account_name  account;
+    TABLE player {
+        uint64_t  account; //account_name to uint64
         vector<int64_t> vbets ;
         uint64_t     primary_key() const { return account; }
         // EOSLIB_SERIALIZE(player, (account)(vbets)) 
     };
-    typedef eosio::multi_index<N(player), player> player_index;
+    typedef eosio::multi_index<"player"_n, player> player_index;
     player_index players;  
 
     
+<<<<<<< Updated upstream
     void apply(account_name code, action_name action);
+=======
+    void apply(uint64_t receiver, uint64_t code, uint64_t action) ;   
+>>>>>>> Stashed changes
   
 private:
     const vector<int64_t> getBets(const string &s, const char &c) ;
@@ -99,27 +121,25 @@ private:
 };
 
 
-void eoscrazytown::apply(account_name code, action_name action) {   
+void eoscrazytown::apply(uint64_t receiver, uint64_t code, uint64_t action) {   
     auto &thiscontract = *this;
-
-    if (action == N(transfer)) {
-        if (code == N(eosio.token)) {
-            execute_action(&thiscontract, &eoscrazytown::onTransfer);
-        }
+    if (action == ( "transfer"_n ).value && code == ( "eosio.token"_n ).value ) {
+        auto transfer_data = unpack_action_data<st_transfer>();
+        onTransfer(transfer_data.from, transfer_data.to, transfer_data.quantity, transfer_data.memo);
         return;
     }
 
-    if (code != _self) return;
+    if (code != get_self().value) return;
     switch (action) {
-        EOSIO_API(eoscrazytown, (init)(test)(clear)(reveal));
+        EOSIO_DISPATCH_HELPER(eoscrazytown, (init)(test)(clear)(reveal));
     };
 }
 
 extern "C" {
     [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) 
     {
-        eoscrazytown p(receiver);
-        p.apply(code, action);
+        eoscrazytown p( name(receiver), name(code), datastream<const char*>(nullptr, 0) );
+        p.apply(receiver, code, action);
         eosio_exit(0);
     }
 }

@@ -1,0 +1,1 @@
+//usr/local/bin/eosio-ld  CMakeFiles/eoscrazytown.wasm.dir/eoscrazytown.cpp.o -o eoscrazytown.wasm 

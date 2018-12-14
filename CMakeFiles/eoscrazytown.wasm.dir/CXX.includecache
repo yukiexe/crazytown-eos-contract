@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mac/Documents/GitHub/eoscrazytown/config.hpp
+
+/Users/mac/Documents/GitHub/eoscrazytown/eoscrazytown.cpp
+eoscrazytown.hpp
+/Users/mac/Documents/GitHub/eoscrazytown/eoscrazytown.hpp
+
+/Users/mac/Documents/GitHub/eoscrazytown/eoscrazytown.hpp
+eosiolib/eosio.hpp
+-
+eosiolib/asset.hpp
+-
+eosiolib/singleton.hpp
+-
+config.hpp
+/Users/mac/Documents/GitHub/eoscrazytown/config.hpp
+utils.hpp
+/Users/mac/Documents/GitHub/eoscrazytown/utils.hpp
+
+/Users/mac/Documents/GitHub/eoscrazytown/utils.hpp
+eosiolib/eosio.hpp
+-
+string
+-
+vector
+-
+
