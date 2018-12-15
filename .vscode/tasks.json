@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "reveal": "always",
     "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}/"
     },
     "tasks": [
         {
@@ -18,18 +18,44 @@
         {
             "label": "Generate ABI",
             "type": "shell",
-            "command": "sh ./.vscode/scripts/generate.sh ${fileBasenameNoExtension}",
+            "command": "eosio-abigen",
+            "args": [
+                "${fileBasenameNoExtension}.cpp",
+                "--contract=${fileBasenameNoExtension}",
+                "--output=${fileBasenameNoExtension}.abi"
+            ]
+        },
+        {
+            "label": "Generate ABI with eosiocpp",
+            "type": "shell",
+            "command": "eosiocpp",
+            "args": [
+                "-g",
+                "${fileBasenameNoExtension}.abi",
+                "${fileBasenameNoExtension}.cpp"
+            ]
+        },
+        {
+            "label": "Generate ABI with cdt v1.2.x",
+            "type": "shell",
+            "command": "eosio-cpp",
+            "args": [
+                "${fileBasenameNoExtension}.cpp",
+                "-o",
+                "${fileBasenameNoExtension}.wasm",
+                "--abigen"
+            ],
             "problemMatcher": []
         },
         {
-            "label": "EZ Build",
+            "label": "Build by eosio-cpp ",
             "type": "shell",
-            "windows": {
-                "command": "sh ./.vscode/scripts/buildez.sh ${fileBasenameNoExtension}"
-            },
-            "osx": {
-                "command": "sh ./.vscode/scripts/osxEZbuild.sh ${fileBasenameNoExtension}"
-            },
+            "command": "eosio-cpp",
+            "args": [
+                "${fileBasenameNoExtension}.cpp",
+                "-o",
+                "${fileBasenameNoExtension}.wasm"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true

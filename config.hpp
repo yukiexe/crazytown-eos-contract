@@ -6,6 +6,13 @@
 #define ODD 0.75
 #define EVEN 1.07
 
+struct rec_reveal {
+    uint8_t dragon ;
+    uint8_t tiger ;
+    capi_checksum256 server_hash;
+    capi_checksum256 client_seed;
+};
+
 #endif
 
 /*

@@ -6,19 +6,7 @@
 using namespace eosio;
 using namespace std;
 
-// @abi table account
-struct account {
-    asset    balance;
-    uint64_t primary_key()const { return balance.amount; }
-};
 
-typedef eosio::multi_index<N(accounts), account> accounts;
-struct rec_reveal {
-    uint8_t dragon ;
-    uint8_t tiger ;
-    capi_checksum256 server_hash;
-    capi_checksum256 client_seed;
-};
 
 struct st_transfer {
     name from;
