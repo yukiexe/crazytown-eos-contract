@@ -30,30 +30,6 @@ CONTRACT eoscrazytown : public eosio::contract {
         players(receiver, receiver.value) {}
 
 
-<<<<<<< Updated upstream
-class eoscrazytown : public eosio::contract {
-    public:    
-        eoscrazytown(account_name self) :
-        contract(self),
-        _global(_self, _self),
-        players(_self, _self){}
-
-
-    // @abi action
-    void init(const checksum256& hash);
-    // @abi action
-    void clear();     
-    // @abi action
-    void test();
-    // @abi action
-    void verify( const checksum256& seed, const checksum256& hash );                        
-    // @abi action
-    void reveal(const checksum256& seed, const checksum256& hash);
-
-    // @abi action
-    void transfer(account_name   from,
-                  account_name   to,
-=======
     ACTION init(const capi_checksum256& hash);
 
     ACTION clear();     
@@ -66,7 +42,6 @@ class eoscrazytown : public eosio::contract {
 
     ACTION transfer(name   from,
                   name   to,
->>>>>>> Stashed changes
                   asset          quantity,
                   string         memo);
     
@@ -81,14 +56,7 @@ class eoscrazytown : public eosio::contract {
 
     TABLE st_global {       
         uint64_t defer_id = 0;
-<<<<<<< Updated upstream
-        checksum256 hash;
-        uint8_t dragon ;
-        uint8_t tiger ;
-        EOSLIB_SERIALIZE( st_global, (defer_id)(hash)(dragon)(tiger)) ;
-=======
         capi_checksum256 hash;
->>>>>>> Stashed changes
     };
     typedef singleton<"global"_n, st_global> singleton_global;
     singleton_global _global;         
@@ -103,11 +71,7 @@ class eoscrazytown : public eosio::contract {
     player_index players;  
 
     
-<<<<<<< Updated upstream
-    void apply(account_name code, action_name action);
-=======
     void apply(uint64_t receiver, uint64_t code, uint64_t action) ;   
->>>>>>> Stashed changes
   
 private:
     const vector<int64_t> getBets(const string &s, const char &c) ;
