@@ -1,37 +1,7 @@
 #include "eoscrazytown.hpp"
 
-<<<<<<< Updated upstream
-// @abi action
-void eoscrazytown::init(const checksum256& hash) {
-    require_auth( _self );
-    
-    // clear() ;
-    // _global.remove(); 
-    auto g = _global.get_or_create( _self, st_global{.hash = hash});    
-    g.hash = hash;
-    _global.set(g, _self); 
-}
-// @abi action
-void eoscrazytown::clear() {
-    require_auth(_self);
-
-    //_global.remove();
-
-        // multi_index can't erase when the format changed
-        auto it = db_lowerbound_i64(_self, _self, N(global), 0);
-        while (it >= 0) {
-            auto del = it;
-            uint64_t dummy;
-            it = db_next_i64(it, &dummy);
-            db_remove_i64(del);
-}
-    
-    //while (players.begin() != players.end()) {
-    //    players.erase(players.begin());
-    // }
-=======
-ACTION eoscrazytown::init(const capi_checksum256& hash) {
-    require_auth( get_self() );
+void eoscrazytown::init(const capi_checksum256& hash) {
+    require_auth(get_self());
     auto g = _global.get_or_create( get_self(), st_global{.hash = hash});    
     g.hash = hash;
     _global.set(g, get_self());
@@ -39,19 +9,24 @@ ACTION eoscrazytown::init(const capi_checksum256& hash) {
     clear() ;
 }
 
-ACTION eoscrazytown::clear() {
+void eoscrazytown::clear() {
     require_auth(get_self());
-    while (players.begin() != players.end()) {
-        players.erase(players.begin());
+    while (_players.begin() != _players.end()) {
+        _players.erase(_players.begin());
     }
->>>>>>> Stashed changes
+    /*
+    // multi_index can't erase when the format changed
+        auto it = db_lowerbound_i64(_self, _self, N(global), 0);
+        while (it >= 0) {
+            auto del = it;
+            uint64_t dummy;
+            it = db_next_i64(it, &dummy);
+            db_remove_i64(del);
+        }
+    */
 }
 
-ACTION eoscrazytown::test(){
-
-}
-
-auto eoscrazytown::checkBets( const asset &eos, const string &memo,
+const auto eoscrazytown::checkBets( const asset &eos, const string &memo,
                               vector<int64_t> &vbets, int64_t &totalBets  ) {  // check eos.amount == total bets
     vbets = getBets( memo, ',' ) ;
     totalBets = getTotalBets( vbets ) ;    
@@ -59,13 +34,8 @@ auto eoscrazytown::checkBets( const asset &eos, const string &memo,
 }
 
 // input
-<<<<<<< Updated upstream
-void eoscrazytown::onTransfer(account_name &from, account_name &to, asset &eos, string &memo) {
-    if (to != _self) return ;
-=======
 ACTION eoscrazytown::onTransfer(name &from, name &to, asset &eos, string &memo) {        
     if (to != get_self()) return ;
->>>>>>> Stashed changes
 
     require_auth(from);
     eosio_assert(eos.is_valid(), "Invalid token transfer...");
@@ -79,28 +49,22 @@ ACTION eoscrazytown::onTransfer(name &from, name &to, asset &eos, string &memo) 
     vector<int64_t> vbets ;
     int64_t totalBets = 0 ;
     eosio_assert( eoscrazytown::checkBets( eos, memo, vbets, totalBets ), "Bets not equal to amount.");
-<<<<<<< Updated upstream
-    eosio_assert( totalBets >= 1, "Bets should >= 1=");
+    eosio_assert( totalBets >= 1, "Bets should >= 1");
     eosio_assert( totalBets <= 100, "Bets should not > 100");
 
-    const auto& sym = eosio::symbol_type(EOS_SYMBOL).name();
-    accounts eos_account(N(eosio.token), _self);
-    auto old_balance = eos_account.get(sym).balance;
+    // const auto& sym = eosio::symbol(EOS_SYMBOL);
+    // accounts eos_account( "eosio.token"_n, get_self().value );
+    // auto old_balance = eos_account.get(sym).balance;
 
-    eosio_assert( totalBets <= old_balance.amount / 20, "Bets too big");
-    auto itr = players.find(from);
-=======
-    auto itr = players.find(from.value);
->>>>>>> Stashed changes
-    if (itr == players.end()) {
-        players.emplace(get_self(), [&](auto& p) {
+    // eosio_assert( totalBets <= old_balance.amount / 20, "Bets too big");
+    auto itr = _players.find(from.value);
+    if (itr == _players.end()) {
+        _players.emplace(get_self(), [&](auto& p) {
             p.account = from.value;
             p.vbets = vbets ;
         });
-    } else {
-        eosio_assert( false, "Already bet.");
-        return ;
-    }
+    } else eosio_assert( false, "Already bet.");
+    
 }
 
 
@@ -136,7 +100,7 @@ auto eoscrazytown::getResult( const card &a,  const card &b ) {
 const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { // need protect
     vector<int64_t> vbets;
     auto vs = explode( s, c ) ;
-    for ( auto n:vs ) {
+    for ( auto &n:vs ) {
         vbets.push_back( (int64_t)string_to_price( n ) ) ;
     }
 
@@ -159,14 +123,14 @@ const vector<int64_t> eoscrazytown::getBets(const string& s, const char& c) { //
 
 auto eoscrazytown::getBeton( const vector<int64_t> &v ) {
     string beton = "" ;
-    for(auto n:v) beton+= ( n != 0 ) ? 'O' : 'n' ;
+    for(auto &n:v) beton+= ( n != 0 ) ? 'O' : 'n' ;
     
     return beton;
 }
 
 const int64_t eoscrazytown::getTotalBets(const vector<int64_t> &v) {
     int64_t totalBets = 0 ;
-    for (auto n:v) totalBets += n ;
+    for (auto &n:v) totalBets += n ;
 
     return totalBets ;
 }
@@ -201,7 +165,7 @@ void eoscrazytown::reveal(const capi_checksum256& seed, const capi_checksum256& 
     string presult = "" ;
     int64_t bonus ;
     const char o = 'O' ;
-    for (const auto& p : players ) {
+    for (const auto& p : _players ) {
         auto& bets = p.vbets ;
         beton = getBeton( bets ) ;
     
@@ -276,18 +240,10 @@ void eoscrazytown::reveal(const capi_checksum256& seed, const capi_checksum256& 
 
         
         action( // winner winner chicken dinner
-<<<<<<< Updated upstream
-            permission_level{_self, N(active)},
-            TOKEN_CONTRACT, N(transfer),
-            make_tuple( _self, p.account, asset(bonus, EOS_SYMBOL),
-                        bonus != 0 ? string("Winner Winner Chicken Dinner. " + presult ) : 
-                              string("Better Luck Next Time") )
-=======
             permission_level{get_self(), "active"_n},
             get_self(), "transfer"_n,
             make_tuple(get_self(), p.account, asset(bonus, EOS_SYMBOL),
                 std::string("winner winner chicken dinner") )
->>>>>>> Stashed changes
         ).send();
 
     }
@@ -298,8 +254,8 @@ void eoscrazytown::reveal(const capi_checksum256& seed, const capi_checksum256& 
     g.tiger = tiger ;
     _global.set(g, _self);
 
-    while (players.begin() != players.end()) {
-        players.erase(players.begin());
+    while (_players.begin() != _players.end()) {
+        _players.erase(_players.begin());
     }
 
     

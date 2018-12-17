@@ -26,59 +26,76 @@ CONTRACT eoscrazytown : public eosio::contract {
     public:    
         eoscrazytown( name receiver, name code, datastream<const char*> ds ) :
         contract(receiver, code, ds),
-        _global(receiver, receiver.value), //  
-        players(receiver, receiver.value) {}
+        _global(receiver, receiver.value),
+        _players(receiver, receiver.value) {}
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e674a5b58ceeea666c4a0c0358641ec476e33ada
     ACTION init(const capi_checksum256& hash);
-
     ACTION clear();     
-
-    ACTION test();
-
-    ACTION verify( const capi_checksum256& seed, const capi_checksum256& hash );                        
-
+    // ACTION test();
+    // ACTION verify( const capi_checksum256& seed, const capi_checksum256& hash );                        
     ACTION reveal(const capi_checksum256& seed, const capi_checksum256& hash);
+<<<<<<< HEAD
 
     ACTION transfer(name   from,
                   name   to,
                   asset          quantity,
                   string         memo);
+=======
+>>>>>>> e674a5b58ceeea666c4a0c0358641ec476e33ada
     
+    // rec
+    ACTION receipt(const rec_reveal& reveal) {
+        require_auth(get_self());
+    }
+
+    struct [[eosio::table("global")]] st_global {       
+        uint64_t defer_id = 0;
+        capi_checksum256 hash;
+<<<<<<< HEAD
+    };
+    typedef singleton<"global"_n, st_global> singleton_global;
+    singleton_global _global;         
+=======
+        uint8_t dragon ;
+        uint8_t tiger ;
+    };   
+>>>>>>> e674a5b58ceeea666c4a0c0358641ec476e33ada
+
+    TABLE player {
+        uint64_t  account; //account_name to uint64
+        vector<int64_t> vbets ;
+        auto primary_key() const { return account; }
+        EOSLIB_SERIALIZE(player, (account)(vbets)) 
+    };
+
+    typedef singleton<"global"_n, st_global> singleton_global;
+    typedef eosio::multi_index<"player"_n, player> player_t;
+    singleton_global _global ;
+    player_t _players;  
+
+    
+<<<<<<< HEAD
+    void apply(uint64_t receiver, uint64_t code, uint64_t action) ;   
+  
+=======
+    void apply(uint64_t receiver, uint64_t code, uint64_t action);
+
+>>>>>>> e674a5b58ceeea666c4a0c0358641ec476e33ada
+private:
     void onTransfer(name   &from,
                     name   &to,
                     asset          &quantity,
                     string         &memo);
 
-    ACTION receipt(const rec_reveal& reveal) {
-        require_auth(get_self());
-    }
-
-    TABLE st_global {       
-        uint64_t defer_id = 0;
-        capi_checksum256 hash;
-    };
-    typedef singleton<"global"_n, st_global> singleton_global;
-    singleton_global _global;         
-
-    TABLE player {
-        uint64_t  account; //account_name to uint64
-        vector<int64_t> vbets ;
-        uint64_t     primary_key() const { return account; }
-        // EOSLIB_SERIALIZE(player, (account)(vbets)) 
-    };
-    typedef eosio::multi_index<"player"_n, player> player_index;
-    player_index players;  
-
-    
-    void apply(uint64_t receiver, uint64_t code, uint64_t action) ;   
-  
-private:
     const vector<int64_t> getBets(const string &s, const char &c) ;
     auto getBeton( const vector<int64_t> &v );
     const int64_t getTotalBets(const vector<int64_t> &v);
 
-    auto checkBets( const asset &eos, const string &memo,
+    const auto checkBets( const asset &eos, const string &memo,
                 vector<int64_t> &vbets, int64_t &totalBets  );                
 
     auto getResult( const card &a,  const card &b ) ;
@@ -95,13 +112,17 @@ void eoscrazytown::apply(uint64_t receiver, uint64_t code, uint64_t action) {
 
     if (code != get_self().value) return;
     switch (action) {
-        EOSIO_DISPATCH_HELPER(eoscrazytown, (init)(test)(clear)(reveal));
+        EOSIO_DISPATCH_HELPER(eoscrazytown,
+                             (init)
+                             (clear)
+                             (reveal)
+                             (receipt)
+        );
     };
 }
 
 extern "C" {
-    [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) 
-    {
+    [[noreturn]] void apply(uint64_t receiver, uint64_t code, uint64_t action) {
         eoscrazytown p( name(receiver), name(code), datastream<const char*>(nullptr, 0) );
         p.apply(receiver, code, action);
         eosio_exit(0);
